@@ -28,6 +28,7 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
     [SerializeField]
     GameObject emptystar;
     
+
     /// <summary>
     /// 手牌的位置
     /// </summary>
@@ -40,6 +41,22 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
     /// 该卡牌的Id
     /// </summary>
     public string cardId;
+	/// <summary>
+	/// 卡牌的消耗
+	/// </summary>
+	private int xiaohao;
+	public int XiaoHao{
+		get{ 
+			return xiaohao;
+		}
+		set{ 
+			if (value<0) {
+				xiaohao = 0;
+				return;
+			}
+			xiaohao = value;
+		}
+	}
     /// <summary>
     /// 该卡牌的RectTransform组件
     /// </summary>
@@ -98,8 +115,6 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
         string test=
         nameText.text=
             ShareDataBase.sDb.SelectFiledSql(string.Format("select \"cardname\" from Card where \"id\"=\"{0}\"", cardId)).ToString();
-        //ShareDataBase.sDb.SelectFiledSql(string.Format("select cardname from Card where id='{0}'", cardId)).ToString();
-        //找到text
         descriptionText = descriptionImg.transform.Find("Text").GetComponent<Text>();
         descriptionText.text=
             ShareDataBase.sDb.SelectFiledSql(string.Format("select \"skill\" from Card where \"id\"=\"{0}\"", cardId)).ToString();
@@ -112,6 +127,9 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
         int starCount =Convert.ToInt32(obj);
          //生猩猩
          UpdateCardStarsUI(starCount);
+		//卡牌的消耗
+		object obj2=ShareDataBase.sDb.SelectFiledSql(string.Format("select \"Xiaohao\" from Card where \"id\"=\"{0}\"", cardId));
+		xiaohao = Convert.ToInt32 (obj);
     }
 
     /// <summary>
@@ -219,8 +237,10 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
             //如果向上拖拽卡牌的位移,大于50,则视为出牌,否则,让卡牌返回原位置
             if (yDelta > 100)
             {
-                //出牌
-                RoleOperation.Instance.ChuPai(cardId);
+				//如果出牌有效,则调用方法
+				if (Player.Instance.ChuPaiYouXiao) {
+					RoleOperation.Instance.ChuPai(cardId);	
+				}
                 //更新UI
                 BattleUIManager._instance.UpdateEnemyAndPlayerState(0.5f);
                 //把yDelta归零

@@ -17,8 +17,8 @@ public class RecordData{
     public event DataHandler DataEvent; // 声明事件
     public void UpdateData()
     {
-       
-
+        RefreshUI rui = new RefreshUI();
+        this.DataEvent += rui.RefreshMainGold;
         if (DataEvent != null)
         {
             DataEvent(CreateANewVenture.Instance.newRecordData);
@@ -90,9 +90,9 @@ public class RecordData{
         int Lvl, int ChushiFali, int ChushiXingdong, int ShoupaiShangxian, int MeihuiheChoupai, int Fame,
         int Courage,int Gold, List<string> OwnedCard, int SpecialAbility)
     {
+        this.MaxHealth = MaxHealth;
         this.PlayerOccupation = PlayerOccupation;
         this.Health = Health;
-        this.MaxHealth = MaxHealth;
         this.Exp = Exp;
         this.MaxExp = MaxExp;
         this.Lvl = Lvl;
@@ -118,5 +118,6 @@ public class RecordData{
         this.Chapter = Chapter;
         this.LastPage = LastPage;
     }
+    
     
 }

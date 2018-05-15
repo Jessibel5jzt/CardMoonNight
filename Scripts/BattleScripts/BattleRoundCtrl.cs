@@ -45,7 +45,7 @@ public class BattleRoundCtrl : MonoBehaviour {
 
     void Start()
     {  
-        whosRound = RoleRound.PlayerRound;
+        whosRound = RoleRound.PlayerRound;	
     } 
 
     void Update()
@@ -67,10 +67,18 @@ public class BattleRoundCtrl : MonoBehaviour {
                     {
                     //玩家回合开始字样
                         StartCoroutine(BattleUIManager._instance.RoundBegin());
-                    //回合开始结算
-                    RoleOperation.Instance.HuiheKaishi_Player();
                     // 玩家接牌
+                    Debug.Log("接牌前:卡包的卡:" + Player.Instance.OwnedCard.Count);
+                    Debug.Log("接牌前:手牌的卡:" + Player.Instance.HandCard.Count);
+                    Debug.Log("接牌前:坟场的卡:" + Player.Instance.UsedCard.Count);
                     StartCoroutine(GetHandCards());
+                    Debug.Log("接牌后:卡包的卡:" + Player.Instance.OwnedCard.Count);
+                    Debug.Log("接牌后:手牌的卡:" + Player.Instance.HandCard.Count);
+                    Debug.Log("接牌后:坟场的卡:" + Player.Instance.UsedCard.Count);
+                    Debug.Log ("接牌完毕,进入玩家回合,准备回合开始的结算@");
+				//回合开始结算
+				RoleOperation.Instance.HuiheKaishi_Player();
+				Debug.Log ("玩家回合开始结算完毕@");
                         MeiJiePai_Player = false;
                         MeiJiePai_Enemy = true;
                         MeiDaPai_Enemy = true;
@@ -100,9 +108,10 @@ public class BattleRoundCtrl : MonoBehaviour {
     /// </summary>
     private IEnumerator GetHandCards()
     {
-        yield return new WaitForSeconds(0.8f);
         int cardCount = Player.Instance.HuiheChoupai;
-        List<string> cardId = RoleOperation.Instance.ChouPai(cardCount, Player.Instance); 
+		Debug.Log ("准备抽牌");
+        List<string> cardId = RoleOperation.Instance.ChouPai(cardCount, Player.Instance);
+        yield return new WaitForSeconds(0.8f);
     }
     /// <summary>
     /// 实例化卡牌,根据Id

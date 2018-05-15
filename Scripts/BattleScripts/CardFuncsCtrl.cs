@@ -3,22 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CardFuncsCtrl : MonoBehaviour {
+public class CardFuncsCtrl : MonoBehaviour
+{
     /// <summary>
     /// 用来存储卡牌方法的委托
     /// </summary>
     /// <param name="role"></param>
     public delegate void CardFuncDelegate();
-    CardFuncDelegate cardFunc;
-    
+    CardFuncDelegate buffFunc = new CardFuncDelegate(MethodNull);
     /// <summary>
     /// 存储所有的卡牌方法的字典
     /// </summary>
     public Dictionary<string, CardFuncDelegate> cardFuncDictionary = new Dictionary<string, CardFuncDelegate>();
-    /// <summary>
-    /// 存储buff的字典
-    /// </summary>
-    public Dictionary<string, CardFuncDelegate> buffsDictionary = new Dictionary<string, CardFuncDelegate>();
+
 
     //单例
     public static CardFuncsCtrl instance;
@@ -27,22 +24,27 @@ public class CardFuncsCtrl : MonoBehaviour {
     //出了几张攻击卡
     private int attackTimes;
     //伤害翻倍
-    private bool doubleDamage=false;
+    private bool doubleDamage = false;
     //免疫伤害
     public bool forbidDamage = false;
     //穿刺伤害
     public bool chuanciDamage = false;
-    
+
 
     void Awake()
     {
         instance = this;
         //初始化方法字典
         InitialFuncsDictionary();
-        Debug.Log("添加了");    
+        Debug.Log("添加了");
     }
-    
-    public void methodNull()
+
+    void Update()
+    {
+        buffFunc();
+    }
+
+    public static void MethodNull()
     {
         //Debug.Log("先看这个委托执行没执行");
     }
@@ -53,11 +55,11 @@ public class CardFuncsCtrl : MonoBehaviour {
 
         DecBlood(Enemy.Instance, 1);
     }
-    
+
     public void qgjc02()
     {
         DecBlood(Enemy.Instance, 3);
-        
+
     }
 
     public void qgjc03()
@@ -72,7 +74,7 @@ public class CardFuncsCtrl : MonoBehaviour {
         DecBlood(Player.Instance, 4);
     }
 
-    
+
 
     public void qgjb01()
     {
@@ -147,7 +149,7 @@ public class CardFuncsCtrl : MonoBehaviour {
         Player.Instance.XingdongLi = 0;
     }
 
-    
+
     public void qxda01()
     {
         RoleOperation.Instance.cpFuncs_player += qxda01_buff;
@@ -168,18 +170,19 @@ public class CardFuncsCtrl : MonoBehaviour {
     public void qzbc01()
     {
         //在界面上添加一个武器和buff
-        BattleUIManager._instance.UpdateEquipmentImg();
-        BattleUIManager._instance.UpdateBuffImg();
+        BattleUIManager._instance.UpdateEquipmentImg("qzbc01");
+        //加入武器list
+        Player.Instance.Equipments.Add("qzbc01");
         RoleOperation.Instance.cpFuncs_player += qzbc01_buff;
     }
     private void qzbc01_buff(string id)
     {
         //如果是攻击牌
-        if (id[1]=='g'&& id[2] == 'j')
+        if (id[1] == 'g' && id[2] == 'j')
         {
             RoleOperation.Instance.duanjiaAttackTimes += 1;
         }
-        if (RoleOperation.Instance.duanjiaAttackTimes%2==0&& RoleOperation.Instance.duanjiaAttackTimes!=0)
+        if (RoleOperation.Instance.duanjiaAttackTimes % 2 == 0 && RoleOperation.Instance.duanjiaAttackTimes != 0)
         {
             DecBlood(Enemy.Instance, 1);
         }
@@ -189,8 +192,7 @@ public class CardFuncsCtrl : MonoBehaviour {
     public void qzbb01()
     {
         //生成装备和buffUI
-        //从卡包中移除改装备卡
-        Player.Instance.OwnedCard.Remove("qzbb01");
+        BattleUIManager._instance.UpdateEquipmentImg("qzbb01");
         //添加到装备List中
         Player.Instance.Equipments.Add("qzbb01");
         RoleOperation.Instance.jsFuncs_Player += qzbb01_buff;
@@ -199,7 +201,7 @@ public class CardFuncsCtrl : MonoBehaviour {
     {
         DecBlood(Enemy.Instance, 3);
     }
-    
+
     //剧毒匕首todo
     public void qzbb02()
     {
@@ -209,31 +211,36 @@ public class CardFuncsCtrl : MonoBehaviour {
     {
 
     }
-    
+
     //圆盾
-    public void qzbb04() {
-        RoleOperation.Instance.ksFuncs_Player += qzbb04_buff;
-    }
-    public  void qzbb04_buff()
+    public void qzbb04()
     {
-       Player.Instance.Didang = 3; 
+        BattleUIManager._instance.UpdateEquipmentImg("qzbb04");
+        RoleOperation.Instance.ksFuncs_Player += qzbb04_buff;
+        Player.Instance.Equipments.Add("qzbb04");
+    }
+    public void qzbb04_buff()
+    {
+        Player.Instance.Didang = 3;
     }
 
     //雷刃
     public void qzbb05()
     {
+        BattleUIManager._instance.UpdateEquipmentImg("qzbb05");
         RoleOperation.Instance.cpFuncs_player += qzbb05_buff;
+        Player.Instance.Equipments.Add("qzbb05");
     }
     private void qzbb05_buff(string id)
     {
-        if (id[1]=='g'&&id[2]=='j')
+        if (id[1] == 'g' && id[2] == 'j')
         {
             DecBlood(Enemy.Instance, 1);
         }
     }
 
     #endregion
-    
+
     #endregion
 
     #region 猎人专属方法
@@ -259,12 +266,12 @@ public class CardFuncsCtrl : MonoBehaviour {
         foreach (string id in Player.Instance.UsedCard)
         {
             //每打过一张行动卡,伤害加1
-            if (id[1] == 'x'&& id[2] == 'd')
+            if (id[1] == 'x' && id[2] == 'd')
             {
                 xingdongka++;
             }
         }
-        DecBlood(Enemy.Instance, 1+xingdongka);
+        DecBlood(Enemy.Instance, 1 + xingdongka);
     }
 
     #region 装备和buff
@@ -272,15 +279,14 @@ public class CardFuncsCtrl : MonoBehaviour {
     //长弓
     public void lzbb01()
     {
+        BattleUIManager._instance.UpdateEquipmentImg("lzbb01");
         RoleOperation.Instance.cpFuncs_player += lzbb01_buff;
-        //从卡包中移除改装备卡
-        Player.Instance.OwnedCard.Remove("lzbb01");
         //添加到装备List中
         Player.Instance.Equipments.Add("lzbb01");
     }
     private void lzbb01_buff(string cardId)
     {
-        if (cardId[1]=='x'&& cardId[2] == 'd')
+        if (cardId[1] == 'x' && cardId[2] == 'd')
         {
             DecBlood(Enemy.Instance, 1);
         }
@@ -290,9 +296,8 @@ public class CardFuncsCtrl : MonoBehaviour {
     //致命匕首
     public void lzbb02()
     {
+        BattleUIManager._instance.UpdateEquipmentImg("lzbb02");
         RoleOperation.Instance.jsFuncs_Player += lzbb02_buff;
-        //从卡包中移除该装备卡
-        Player.Instance.OwnedCard.Remove("lzbb02");
         //添加到装备List中
         Player.Instance.Equipments.Add("lzbb02");
     }
@@ -307,6 +312,7 @@ public class CardFuncsCtrl : MonoBehaviour {
     //速度之靴
     public void lzba01()
     {
+        BattleUIManager._instance.UpdateEquipmentImg("lzba01");
         //从卡包中移除该装备卡
         Player.Instance.OwnedCard.Remove("lzba01");
         //添加到装备List中
@@ -315,13 +321,13 @@ public class CardFuncsCtrl : MonoBehaviour {
     }
     public void lzba01_buff()
     {
-        RoleOperation.Instance.ChouPai(1,Player.Instance);
+        RoleOperation.Instance.ChouPai(1, Player.Instance);
         Player.Instance.XingdongLi++;
     }
 
-    
 
-   
+
+
     #endregion
 
     #region 行动卡
@@ -383,13 +389,13 @@ public class CardFuncsCtrl : MonoBehaviour {
         //移除所有的牌
         BattleRoundCtrl._instance.YiChuPaiGameObject(count);
         //接相同数量的牌
-        RoleOperation.Instance.ChouPai(count,Player.Instance);
+        RoleOperation.Instance.ChouPai(count, Player.Instance);
     }
-    
-    public void  lxdb05()
+
+    public void lxdb05()
     {
         //伤害翻倍,仅限于下张伤害牌
-        doubleDamage = true; 
+        doubleDamage = true;
     }
 
     public void lxdb06()
@@ -411,13 +417,14 @@ public class CardFuncsCtrl : MonoBehaviour {
         RoleOperation.Instance.ksFuncs_Player -= lxdb06_buffRemove;
     }
 
-    public void lxdb07() {
+    public void lxdb07()
+    {
         int shanghai = (Player.Instance.HandCard.Count + Player.Instance.XingdongLi) * 3 + 6;
-            DecBlood(Enemy.Instance, shanghai);
+        DecBlood(Enemy.Instance, shanghai);
         Player.Instance.XingdongLi = 0;
         BattleRoundCtrl._instance.YiChuPaiGameObject(Player.Instance.HandCard.Count);
     }
-    
+
     public void lxdb08()
     {
         int count = 0;
@@ -505,13 +512,13 @@ public class CardFuncsCtrl : MonoBehaviour {
         doubleDamage = true;
     }
 
-    public void  lxda03()
+    public void lxda03()
     {
         RoleOperation.Instance.cpFuncs_player += lxda03_buff;
     }
     public void lxda03_buff(string id)
     {
-        if (RoleOperation.Instance.lxda03_times<=4)
+        if (RoleOperation.Instance.lxda03_times <= 4)
         {
             if (id[1] == 'g' && id[2] == 'j')
             {
@@ -520,11 +527,11 @@ public class CardFuncsCtrl : MonoBehaviour {
                 return;
             }
         }
-       RoleOperation.Instance.lxda03_times = 0;
-       RoleOperation.Instance.cpFuncs_player -= lxda03_buff;
-        
+        RoleOperation.Instance.lxda03_times = 0;
+        RoleOperation.Instance.cpFuncs_player -= lxda03_buff;
+
     }
-    
+
     public void lxda04()
     {
         RoleOperation.Instance.ChouPai(1, Player.Instance);
@@ -549,22 +556,571 @@ public class CardFuncsCtrl : MonoBehaviour {
     #endregion
     #endregion
 
-    public void txdc01()
+    #region 法师
+    public void fgjc01()
     {
-        if (Enemy.Instance.Health < Enemy.Instance.MaxHealth * 0.3)
+        DecBlood(Enemy.Instance, 1);
+    }
+    public void fgjc02()
+    {
+        DecBlood(Enemy.Instance, 2);
+    }
+    public void fgjc03()
+    {
+        DecBlood(Enemy.Instance, 3);
+    }
+
+    #region 法力卡
+    public void fflc01()
+    {
+        AddFali(Player.Instance, 2);
+    }
+    public void fflc02()
+    {
+        AddFali(Player.Instance, 4);
+    }
+    public void fflc03()
+    {
+        AddFali(Player.Instance, 6);
+    }
+    public void fflb01()
+    {
+        AddFali(Player.Instance, 3);
+        AddBlood(Player.Instance, 3);
+    }
+    //获得三点法力,本回合法力消耗减3
+    public void fflb02()
+    {
+        AddFali(Player.Instance, 3);
+        RoleOperation.Instance.cpFuncs_player += fflb02_buff;
+    }
+    public void fflb02_buff(string id)
+    {
+        Transform handcardPanel = GameObject.Find("Panel_PlayerCard").transform;
+        foreach (Transform item in handcardPanel)
         {
-            DecBlood(Enemy.Instance, 22);
+            string cardId = item.GetComponent<CardUI>().cardId;
+            if (cardId[1] == 'f' && cardId[2] == 'l')
+            {
+                item.GetComponent<CardUI>().XiaoHao -= 3;
+            }
         }
-        else
+        RoleOperation.Instance.cpFuncs_player -= fflb02_buff;
+    }
+
+    public void fflb03()
+    {
+        AddFali(Player.Instance, 5);
+        RoleOperation.Instance.cpFuncs_player += fflb03_buff;
+    }
+    public void fflb03_buff(string id)
+    {
+        if (id[1] == 'z' && id[2] == 's')
         {
-            DecBlood(Enemy.Instance, 2);
+            RoleOperation.Instance.cpFuncs_player -= fflb03_buff;
+            RoleOperation.Instance.ChuPai(id);
+        }
+    }
+
+    public void fflb04()
+    {
+        AddFali(Player.Instance, 3);
+        foreach (string cardId in Player.Instance.OwnedCard)
+        {
+            if (cardId[1] == 'f' && cardId[2] == 'l')
+            {
+                //加入手牌
+                Player.Instance.HandCard.Add(cardId);
+                //从卡包移除
+                int index = Player.Instance.OwnedCard.IndexOf(cardId);
+                Player.Instance.OwnedCard.RemoveAt(index);
+                //
+                List<string> id = new List<string>();
+                id.Add(cardId);
+                BattleRoundCtrl._instance.GenerateCard(id);
+                break;
+            }
+        }
+    }
+
+    public void fflb05()
+    {
+        AddFali(Player.Instance, 3);
+        //减伤+3,持续1回合
+        RoleOperation.Instance.ksFuncs_Player += fflb05_buff;
+    }
+    public void fflb05_buff()
+    {
+        Player.Instance.JianShang += 3;
+        RoleOperation.Instance.ksFuncs_Player -= fflb05_buff;
+    }
+
+    public void fflb06()
+    {
+        AddFali(Player.Instance, 3);
+        RoleOperation.Instance.ChouPai(1, Player.Instance);
+    }
+
+    public void fflb07()
+    {
+        AddFali(Player.Instance, 5);
+        chuanciDamage = true;
+    }
+
+    public void fflb08()
+    {
+        AddFali(Player.Instance, 5);
+        //敌人出的下张卡无效
+        Enemy.Instance.ChuPaiYouXiao = false;
+        RoleOperation.Instance.cpFuncs_enemy += fflb08_buff;
+    }
+    public void fflb08_buff(string id)
+    {
+        Enemy.Instance.ChuPaiYouXiao = true;
+        RoleOperation.Instance.cpFuncs_enemy -= fflb08_buff;
+    }
+
+    public void fflb09()
+    {
+        AddFali(Player.Instance, 3);
+        FaShuDecBlood(Enemy.Instance, 3, 0, 0);
+        Player.Instance.HuoDamageIncrease += 1;
+        RoleOperation.Instance.jsFuncs_Player += fflb09_buff;
+    }
+    public void fflb09_buff()
+    {
+        Player.Instance.HuoDamageIncrease -= 1;
+    }
+
+    public void fflb10()
+    {
+        AddFali(Player.Instance, 3);
+        Enemy.Instance.HanLeng += 1;
+        FaShuDecBlood(Enemy.Instance, 0, 3, 0);
+    }
+
+    public void fflb11()
+    {
+        AddFali(Player.Instance, 5);
+        foreach (string cardId in Player.Instance.OwnedCard)
+        {
+            if (cardId[1] == 'z' && cardId[2] == 's')
+            {
+                //加入手牌
+                Player.Instance.HandCard.Add(cardId);
+                //从卡包移除
+                int index = Player.Instance.OwnedCard.IndexOf(cardId);
+                Player.Instance.OwnedCard.RemoveAt(index);
+                //
+                List<string> id = new List<string>();
+                id.Add(cardId);
+                BattleRoundCtrl._instance.GenerateCard(id);
+                break;
+            }
+        }
+    }
+
+    #endregion
+
+    #region 咒术卡
+    public void fzsc01()
+    {
+        FaShuDecBlood(Enemy.Instance, 2, 2, 0);
+    }
+    public void fzsc02()
+    {
+        FaShuDecBlood(Enemy.Instance, 2, 2, 2);
+    }
+    public void fzsc03()
+    {
+        AddBlood(Enemy.Instance, 5);
+    }
+    //todo
+    public void fzsc04()
+    {
+
+    }
+
+    public void fzsb01()
+    {
+        Enemy.Instance.ZhongDu += 3;
+    }
+
+    public void fzsb02()
+    {
+        FaShuDecBlood(Enemy.Instance, 6, 0, 0);
+        Player.Instance.HuoDamageIncrease += 2;
+        RoleOperation.Instance.jsFuncs_Player += fzsb02_buff;
+    }
+    public void fzsb02_buff()
+    {
+        Player.Instance.HuoDamageIncrease -= 2;
+        RoleOperation.Instance.jsFuncs_Player -= fzsb02_buff;
+    }
+    //todo忏悔
+    public void fzsb03()
+    {
+
+    }
+
+    public void fzsb04()
+    {
+        FaShuDecBlood(Enemy.Instance, 0, 0, 4);
+        foreach (string cardId in Player.Instance.OwnedCard)
+        {
+            if (cardId[1] == 'z' && cardId[2] == 's')
+            {
+                //加入手牌
+                Player.Instance.HandCard.Add(cardId);
+                //从卡包移除
+                int index = Player.Instance.OwnedCard.IndexOf(cardId);
+                Player.Instance.OwnedCard.RemoveAt(index);
+                //
+                List<string> id = new List<string>();
+                id.Add(cardId);
+                BattleRoundCtrl._instance.GenerateCard(id);
+                break;
+            }
         }
 
     }
 
+    public void fzsb05()
+    {
+        Player.Instance.Armour += 8;
+    }
+
+    public void fzsb06()
+    {
+        Player.Instance.JianShang += 2;
+        RoleOperation.Instance.ksFuncs_Player += fzsb06_buff;
+    }
+    public void fzsb06_buff()
+    {
+        Player.Instance.JianShang -= 2;
+        RoleOperation.Instance.ksFuncs_Player -= fzsb06_buff;
+    }
+
+    public void fzsb07()
+    {
+        RoleOperation.Instance.cpFuncs_enemy += fzsb07_buff;
+        RoleOperation.Instance.ksFuncs_Player += fzsb07_buffRemove;
+    }
+    public void fzsb07_buff(string id)
+    {
+        if (id[1] == 'g' && id[2] == 'j')
+        {
+            FaShuDecBlood(Enemy.Instance, 2, 0, 0);
+        }
+    }
+    public void fzsb07_buffRemove()
+    {
+        RoleOperation.Instance.cpFuncs_enemy -= fzsb07_buff;
+        RoleOperation.Instance.ksFuncs_Player -= fzsb07_buffRemove;
+    }
+
+    //todo
+    public void fzsb08()
+    {
+
+    }
+
+    public void fzsb09()
+    {
+        Player.Instance.Didang += Player.Instance.Fali;
+        RoleOperation.Instance.ksFuncs_Player += fzsb09_buff;
+    }
+    public void fzsb09_buff()
+    {
+        Player.Instance.Didang = 0;
+        RoleOperation.Instance.ksFuncs_Player -= fzsb09_buff;
+    }
+
+
+    public void fzsb10()
+    {
+        chuanciDamage = true;
+        DecBlood(Enemy.Instance, 10);
+    }
+
+    public void fzsb11()
+    {
+        int ccShanghai = Player.Instance.Health + 10 - Player.Instance.MaxHealth;
+        AddBlood(Enemy.Instance, 10);
+        if (ccShanghai > 0)
+        {
+            chuanciDamage = true;
+            DecBlood(Enemy.Instance, ccShanghai);
+        }
+    }
+
+    public void fzsb12()
+    {
+        FaShuDecBlood(Enemy.Instance, 0, 4, 0);
+        Enemy.Instance.HanLeng += 1;
+    }
+
+    public void fzsb13()
+    {
+        Enemy.Instance.HanLeng += 2;
+        Enemy.Instance.HuiheChoupai -= 1;
+        RoleOperation.Instance.jsFuncs_Enemy += fzsb13_Remove;
+    }
+    public void fzsb13_Remove()
+    {
+        Enemy.Instance.HuiheChoupai += 1;
+        RoleOperation.Instance.jsFuncs_Enemy -= fzsb13_Remove;
+    }
+
+    public void fzsb14()
+    {
+        int hujia = Player.Instance.Health + 15 - Player.Instance.MaxHealth;
+        AddBlood(Enemy.Instance, 15);
+        if (hujia > 0)
+        {
+            Player.Instance.Armour += hujia;
+        }
+    }
+
+    #endregion
+
+    #region 装备卡
+    public void fzbc01()
+    {
+        BattleUIManager._instance.UpdateEquipmentImg("fzbc01");
+        RoleOperation.Instance.cpFuncs_player += fzbc01_buff;
+    }
+    public void fzbc01_buff(string id)
+    {
+        if (Player.Instance.FaliIncrease > 0)
+        {
+            DecBlood(Enemy.Instance, Enemy.Instance.FaliIncrease / 2);
+        }
+        //装备被摧毁时取消该buff
+    }
+    #endregion
+    #endregion
+
+
+
+    #region 通用
+    #region 行动卡
+    public void txdc01()
+    {
+        int shanghai = 1;
+        //这张卡是第一张卡
+        if (Player.Instance.UsedCard.Count == 0)
+        {
+            shanghai += 6;
+        }
+        DecBlood(Enemy.Instance, shanghai);
+    }
+
+    //todo
+    public void txdc02()
+    {
+        //RoleOperation.Instance.ChouPai(3,Player.Instance);
+
+    }
+
+    public void txdc03()
+    {
+        RoleOperation.Instance.ChouPai(1, Player.Instance);
+        Enemy.Instance.ZhongDu += 3;
+    }
+
+    public void txdc04()
+    {
+        Enemy.Instance.HuiheChoupai--;
+        RoleOperation.Instance.jsFuncs_Enemy += txdc04_buff;
+    }
+    public void txdc04_buff()
+    {
+        Enemy.Instance.HuiheChoupai++;
+    }
+
+    public void txdc05()
+    {
+        DecBlood(Enemy.Instance, 1);
+        Enemy.Instance.HuiheChoupai--;
+        RoleOperation.Instance.jsFuncs_Enemy += txdc05_buff;
+    }
+    public void txdc05_buff()
+    {
+        Enemy.Instance.HuiheChoupai++;
+    }
+    
+    //todo
+    public void txdc06()
+    {
+
+    }
+
+    public void txdc07()
+    {
+        FaShuDecBlood(Enemy.Instance, 3, 0, 0);
+        RoleOperation.Instance.ksFuncs_Enemy += txdc07_buff;
+    }
+    public void txdc07_buff()
+    {
+        FaShuDecBlood(Enemy.Instance, 3, 0, 0);
+        RoleOperation.Instance.ksFuncs_Enemy -= txdc07_buff;
+    }
+
+    //todo
+    public void txdc08()
+    {
+
+    }
+    //todo
+    public void txdc09()
+    {
+
+    }
+    //todo
+    public void txdc10()
+    {
+
+    }
+
+    public void txdc11()
+    {
+        int shanghai = 2;
+        if (Enemy.Instance.Health < Enemy.Instance.MaxHealth * 0.3f)
+        {
+            shanghai = 20;
+        }
+        DecBlood(Enemy.Instance, shanghai);
+    }
+
+    //todo
+    public void txdb01()
+    {
+
+    }
+
+    public void txdb02()
+    {
+        RoleOperation.Instance.ChouPai(2, Player.Instance);
+    }
+    //todo
+    public void txdb03()
+    {
+
+    }
+    
+    public void txdb04()
+    {
+        int index = UnityEngine.Random.Range(0,Player.Instance.HandCard.Count);
+        List<string> list = new List<string>();
+        list.Add(Player.Instance.HandCard[index]);
+        BattleUIManager._instance.QiPai(list);
+        DecBlood(Enemy.Instance, 8);
+    }
+
+    public void txdb05()
+    {
+        AddBlood(Enemy.Instance, 5);
+        if (Enemy.Instance.Equipments.Count > 0)
+        {
+            int index = UnityEngine.Random.Range(0, Enemy.Instance.Equipments.Count);
+            Enemy.Instance.Equipments.RemoveAt(index);
+        }
+    }
+
+    public void txdb06()
+    {
+        BattleUIManager._instance.QiPai(Player.Instance.HandCard);
+        Player.Instance.Armour += Player.Instance.HandCard.Count * 5;
+    }
+
+    public void txdb07()
+    {
+        DecBlood(Enemy.Instance, 3);
+        Enemy.Instance.Fali = 0;
+    }
+    //todo
+    public void txdb08()
+    {
+
+    }
+    
+    public void txdb09()
+    {
+        int count = Player.Instance.Equipments.Count;
+        RoleOperation.Instance.ChouPai(count, Player.Instance);
+    }
+
+   
+    public void txdb10()
+    {
+        RoleOperation.Instance.ChouPai(1, Player.Instance);
+        RoleOperation.Instance.ksFuncs_Enemy += txdb10_buff;
+    }
+    private void txdb10_buff()
+    {
+        Enemy.Instance.ChuPaiYouXiao = false;
+        RoleOperation.Instance.ksFuncs_Enemy -= txdb10_buff;
+    }
+
+    public void txdb11()
+    {
+        RoleOperation.Instance.ChouPai(2,Player.Instance,Player.Instance.UsedCard);
+    }
+    //移除敌人卡包里的一张卡
+    public void txdb12()
+    {
+        int index = UnityEngine.Random.Range(0, Enemy.Instance.OwnedCard.Count);
+        Enemy.Instance.OwnedCard.RemoveAt(index);
+    }
+
+    public void txdb13()
+    {
+        RoleOperation.Instance.ksFuncs_Player += txdb13_buff;
+    }
+    public void txdb13_buff()
+    {
+        AddBlood(Player.Instance,2);
+    }
+
+    public void txdb14()
+    {
+
+    }
+    public void txdb15()
+    {
+
+    }
+
+    public void txdb16()
+    {
+
+    }
+
+    public void txdb17()
+    {
+
+    }
+    public void txdb18()
+    {
+
+    }
+    public void txdb19()
+    {
+
+    }
+
+    public void txdb20()
+    {
+        Player.Instance.Armour += 8;
+    }
+    #endregion
+
+    #region 装备
     //圣光护盾
     public void tzba02()
     {
+        BattleUIManager._instance.UpdateEquipmentImg("tzba02");
         RoleOperation.Instance.ksFuncs_Player += tzba02_buff;
         //从卡包中移除该装备卡
         Player.Instance.OwnedCard.Remove("tzba02");
@@ -577,31 +1133,193 @@ public class CardFuncsCtrl : MonoBehaviour {
         //+3hujia
         Player.Instance.Armour += 3;
     }
+
+    //隐藏服
+    public void tzbc01()
+    {
+        BattleUIManager._instance.UpdateEquipmentImg("tzbc01");
+        Player.Instance.ShanBi += 1;
+        RoleOperation.Instance.cpFuncs_player += tzbc01_buff;
+    }
+    public void tzbc01_buff(string id)
+    {
+        //闪避成功
+        if (Player.Instance.SuccessfulShanBi)
+        {
+            RoleOperation.Instance.ChouPai(1, Player.Instance);
+        }
+    }
+    #endregion
+
+    #region 攻击卡
+    public void tgjb01()
+    {
+        DecBlood(Enemy.Instance, 2);
+        RoleOperation.Instance.cpFuncs_player += tgjb01_buff;
+    }
+    private void tgjb01_buff(string id)
+    {
+        if (Enemy.Instance.Health == 0)
+        {
+            Player.Instance.MaxHealth += 2;
+        }
+        RoleOperation.Instance.cpFuncs_player -= tgjb01_buff;
+    }
+
+    public void tgjb02()
+    {
+        DecBlood(Enemy.Instance, 4);
+        RoleOperation.Instance.cpFuncs_player += tgjb02_buff;
+    }
+    private void tgjb02_buff(string id)
+    {
+        if (Enemy.Instance.Health == 0)
+        {
+            Player.Instance.MaxHealth += 2;
+        }
+        RoleOperation.Instance.cpFuncs_player -= tgjb02_buff;
+    }
+
+    public void tgjb03()
+    {
+        DecBlood(Enemy.Instance, 6);
+        RoleOperation.Instance.cpFuncs_player += tgjb03_buff;
+    }
+    private void tgjb03_buff(string id)
+    {
+        if (Enemy.Instance.Health == 0)
+        {
+            Player.Instance.MaxHealth += 2;
+        }
+        RoleOperation.Instance.cpFuncs_player -= tgjb03_buff;
+    }
+
+    public void tgjb04()
+    {
+        int shanghai = 2 + (Player.Instance.MaxHealth - Player.Instance.Health) / 5;
+        DecBlood(Enemy.Instance, shanghai);
+    }
+    public void tgjb05()
+    {
+        int shanghai = 4 + (Player.Instance.MaxHealth - Player.Instance.Health) / 5;
+        DecBlood(Enemy.Instance, shanghai);
+    }
+    public void tgjb06()
+    {
+        int shanghai = 6 + (Player.Instance.MaxHealth - Player.Instance.Health) / 5;
+        DecBlood(Enemy.Instance, shanghai);
+    }
+
+    public void tgjb07()
+    {
+        int shanghai = 1;
+        if (Enemy.Instance.Health < 30)
+        {
+            shanghai++;
+        }
+        DecBlood(Enemy.Instance, shanghai);
+    }
+    public void tgjb08()
+    {
+        int shanghai = 3;
+        if (Enemy.Instance.Health < 30)
+        {
+            shanghai++;
+        }
+        DecBlood(Enemy.Instance, shanghai);
+    }
+    public void tgjb09()
+    {
+        int shanghai = 5;
+        if (Enemy.Instance.Health < 30)
+        {
+            shanghai++;
+        }
+        DecBlood(Enemy.Instance, shanghai);
+    }
+
+    public void tgjb10()
+    {
+        DecBlood(Enemy.Instance, 2);
+        AddFali(Player.Instance, 2);
+    }
+    public void tgjb11()
+    {
+        DecBlood(Enemy.Instance, 4);
+        AddFali(Player.Instance, 4);
+    }
+    public void tgjb12()
+    {
+        DecBlood(Enemy.Instance, 6);
+        AddFali(Player.Instance, 6);
+    }
+
+    public void tgjb13()
+    {
+        Enemy.Instance.ZhongDu += 1;
+    }
+    public void tgjb14()
+    {
+        Enemy.Instance.ZhongDu += 2;
+    }
+    public void tgjb15()
+    {
+        Enemy.Instance.ZhongDu += 3;
+    }
+
+    public void tgjb16()
+    {
+        DecBlood(Enemy.Instance, 2);
+        RoleOperation.Instance.ChouPai(1, Player.Instance);
+    }
+
+    public void tgjb17()
+    {
+        DecBlood(Enemy.Instance, 5);
+        RoleOperation.Instance.jsFuncs_Player += tgjb17_buff;
+        RoleOperation.Instance.ksFuncs_Player += tgjb17_buffRemove;
+    }
+    private void tgjb17_buffRemove()
+    {
+        RoleOperation.Instance.jsFuncs_Player -= tgjb17_buff;
+        RoleOperation.Instance.ksFuncs_Player -= tgjb17_buffRemove;
+    }
+    private void tgjb17_buff()
+    {
+        Player.Instance.JianShang += 2;
+
+    }
+    #endregion
+
+
+
+    #endregion
+
     #region 敌人卡牌方法
     //玩家掉10血
     public void egjc01()
     {
-        DecBlood(Player.Instance,5);
-        
+        DecBlood(Player.Instance, 1);
+
     }
     //减玩家2行动,5法力
     public void egjc02()
     {
         DecFali(Player.Instance, 5);
         DecXingdong(Player.Instance, 2);
-        
+
     }
     //赠3法力
     public void egjc03()
     {
         AddFali(Enemy.Instance, 3);
-        
+
     }
     //加1行动
     public void egjc04()
     {
         AddXingdong(Enemy.Instance, 1);
-        
+
     }
 
     public void egjc05()
@@ -634,7 +1352,6 @@ public class CardFuncsCtrl : MonoBehaviour {
         //抵挡优先计算,护甲后计算,减伤最后计算
         //真实伤害
         int damage = 0;
-
         //如果不是穿刺伤害
         if (chuanciDamage == false)
         {
@@ -705,6 +1422,7 @@ public class CardFuncsCtrl : MonoBehaviour {
             //如果闪避到了
             if (numbers.Contains(one))
             {
+                role.SuccessfulShanBi = true;
                 damage = 0;
             }
         }
@@ -712,6 +1430,31 @@ public class CardFuncsCtrl : MonoBehaviour {
         role.Damage = damage;
         //减血
         role.Health -= damage;
+        //重置穿刺伤害
+        chuanciDamage = false;
+    }
+
+    /// <summary>
+    /// 法术伤害方法
+    /// </summary>
+    /// <param name="role">Role.</param>
+    /// <param name="huoNum">火属性伤害.</param>
+    /// <param name="shuiNum">水属性伤害.</param>
+    /// <param name="leiNum">雷属性伤害.</param>
+    private void FaShuDecBlood(RoleBase role, int huoNum, int shuiNum, int leiNum)
+    {
+        //火属性伤害加成
+        huoNum += Player.Instance.HuoDamageIncrease;
+        DecBlood(role, huoNum);
+        //水,如果有寒冷状态,收到的水属性伤害翻倍
+        if (role.HanLeng > 0)
+        {
+            shuiNum *= 2;
+            role.HanLeng--;
+        }
+        DecBlood(role, shuiNum);
+        //雷
+        DecBlood(role, leiNum);
     }
     /// <summary>
     /// 加蓝量
@@ -721,6 +1464,7 @@ public class CardFuncsCtrl : MonoBehaviour {
     public void AddFali(RoleBase role, int num)
     {
         role.Fali += num;
+        role.FaliIncrease = num;
     }
     /// <summary>
     /// 减蓝量
@@ -751,6 +1495,8 @@ public class CardFuncsCtrl : MonoBehaviour {
     }
 
     #endregion
+
+
 
     /// <summary>
     /// 将方法添加到字典中
@@ -819,13 +1565,109 @@ public class CardFuncsCtrl : MonoBehaviour {
 
         #endregion
 
-        cardFuncDictionary.Add("txdc01", txdc01);
+        #region 法师
+        cardFuncDictionary.Add("fgjc01", fgjc01);
+        cardFuncDictionary.Add("fgjc02", fgjc02);
+        cardFuncDictionary.Add("fgjc03", fgjc03);
+
+        #region 法力卡
+        cardFuncDictionary.Add("fflc01", fflc01);
+        cardFuncDictionary.Add("fflc02", fflc02);
+        cardFuncDictionary.Add("fflc03", fflc03);
+        cardFuncDictionary.Add("fflb01", fflb01);
+        cardFuncDictionary.Add("fflb02", fflb02);
+        cardFuncDictionary.Add("fflb03", fflb03);
+        cardFuncDictionary.Add("fflb04", fflb04);
+        cardFuncDictionary.Add("fflb05", fflb05);
+        cardFuncDictionary.Add("fflb06", fflb06);
+        cardFuncDictionary.Add("fflb07", fflb07);
+        cardFuncDictionary.Add("fflb08", fflb08);
+        cardFuncDictionary.Add("fflb09", fflb09);
+        cardFuncDictionary.Add("fflb10", fflb10);
+        cardFuncDictionary.Add("fflb11", fflb11);
+        #endregion
+        #region 咒术卡
+        cardFuncDictionary.Add("fzsc01", fzsc01);
+        cardFuncDictionary.Add("fzsc02", fzsc02);
+        cardFuncDictionary.Add("fzsc03", fzsc03);
+        cardFuncDictionary.Add("fzsc04", fzsc04);
+        cardFuncDictionary.Add("fzsb01", fzsb01);
+        cardFuncDictionary.Add("fzsb02", fzsb02);
+        cardFuncDictionary.Add("fzsb03", fzsb03);
+        cardFuncDictionary.Add("fzsb04", fzsb04);
+        cardFuncDictionary.Add("fzsb05", fzsb05);
+        cardFuncDictionary.Add("fzsb06", fzsb06);
+        cardFuncDictionary.Add("fzsb07", fzsb07);
+        cardFuncDictionary.Add("fzsb08", fzsb08);
+        cardFuncDictionary.Add("fzsb09", fzsb09);
+        cardFuncDictionary.Add("fzsb10", fzsb10);
+        cardFuncDictionary.Add("fzsb11", fzsb11);
+        cardFuncDictionary.Add("fzsb12", fzsb12);
+        cardFuncDictionary.Add("fzsb13", fzsb13);
+        cardFuncDictionary.Add("fzsb14", fzsb14);
+        #endregion
+        #region 装备
+        cardFuncDictionary.Add("fzbc01", fzbc01);
+        #endregion
+        #endregion
+
+
+        #region 通用
+        #region 装备
+        cardFuncDictionary.Add("tzbc01", tzbc01);//隐藏服
         cardFuncDictionary.Add("tzba02", tzba02);//圣光护盾
-        //敌人
-        cardFuncDictionary.Add("egjc01",egjc01);
+        #endregion
+        #region 行动卡
+        cardFuncDictionary.Add("txdc01", txdc01);//
+        cardFuncDictionary.Add("txdc02", txdc02);
+        cardFuncDictionary.Add("txdc03", txdc03);
+        cardFuncDictionary.Add("txdc04", txdc04);
+        cardFuncDictionary.Add("txdc05", txdc05);
+        cardFuncDictionary.Add("txdc06", txdc06);
+        cardFuncDictionary.Add("txdc07", txdc07);
+        cardFuncDictionary.Add("txdc08", txdc08);
+        cardFuncDictionary.Add("txdc09", txdc09);
+        cardFuncDictionary.Add("txdc10", txdc10);
+        cardFuncDictionary.Add("txdc11", txdc11);
+
+        cardFuncDictionary.Add("txdb01", txdb01);
+        cardFuncDictionary.Add("txdb02", txdb02);
+        cardFuncDictionary.Add("txdb03", txdb03);
+        cardFuncDictionary.Add("txdb04", txdb04);
+        cardFuncDictionary.Add("txdb05", txdb05);
+        cardFuncDictionary.Add("txdb06", txdb06);
+        cardFuncDictionary.Add("txdb07", txdb07);
+        cardFuncDictionary.Add("txdb08", txdb08);
+        cardFuncDictionary.Add("txdb09", txdb09);
+        cardFuncDictionary.Add("txdb10", txdb10);
+        cardFuncDictionary.Add("txdb11", txdb11);
+        cardFuncDictionary.Add("txdb12", txdb12);
+        cardFuncDictionary.Add("txdb13", txdb13);
+        cardFuncDictionary.Add("txdb14", txdb14);
+        cardFuncDictionary.Add("txdb15", txdb15);
+        cardFuncDictionary.Add("txdb16", txdb16);
+        cardFuncDictionary.Add("txdb17", txdb17);
+        cardFuncDictionary.Add("txdb18", txdb18);
+        cardFuncDictionary.Add("txdb19", txdb19);
+        cardFuncDictionary.Add("txdb20", txdb20);
+        #endregion
+
+
+
+
+
+
+        #endregion
+
+        #region 敌人
+        cardFuncDictionary.Add("egjc01", egjc01);
         cardFuncDictionary.Add("egjc02", egjc02);
         cardFuncDictionary.Add("egjc03", egjc03);
         cardFuncDictionary.Add("egjc04", egjc04);
         cardFuncDictionary.Add("egjc05", egjc05);
+        #endregion
+
     }
+
 }
+

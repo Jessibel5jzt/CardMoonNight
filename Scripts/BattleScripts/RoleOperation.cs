@@ -42,23 +42,64 @@ public class RoleOperation : Singleton<RoleOperation> {
     /// 敌人回合结束的结算
     /// </summary>
     public RoundEndFunction jsFuncs_Enemy= new RoundEndFunction(CommanEndCalculate_Enemy);
+
     
     /// <summary>
     /// 回合开始默认方法_玩家
     /// </summary>
     private static void CommanBeginCalculate_Player()
-    {
+	{	
+		//中毒
+		if (Player.Instance.ZhongDu>0) {
+			Player.Instance.Health-=Player.Instance.ZhongDu;
+			Player.Instance.ZhongDu--;
+		}
         //更新回合数
         BattleRoundCtrl._instance.roundCount += 1;
         //更新UI
         BattleUIManager._instance.UpdatePlayerState();
+        Debug.Log("上回合坟场的牌:"+ Player.Instance.UsedCard.Count);
+        Debug.Log("卡包牌:" + Player.Instance.OwnedCard.Count);
+        //坟场的牌进入ownedCard
+        for (int i = 0; i < Player.Instance.UsedCard.Count; i++)
+		{
+			string cardId = Player.Instance.UsedCard[i];
+			//是装备就不进
+			if (cardId[1]=='z'&& cardId[2] == 'b')
+			{
+				continue;
+			}
+			Player.Instance.OwnedCard.Add(Player.Instance.UsedCard[i]);
+		}
+        Debug.Log("进卡包后坟场牌:" + Player.Instance.UsedCard.Count);
+        Debug.Log("进卡包后卡包牌:" + Player.Instance.OwnedCard.Count);
+        //清空坟场的牌
+        Player.Instance.UsedCard.Clear();
     }
     /// <summary>
     /// 回合开始默认方法_敌人
     /// </summary>
     private static void CommanBeginCalculate_Enemy()
     {
+		//中毒
+		if (Enemy.Instance.ZhongDu>0) {
+			Enemy.Instance.Health-=Enemy.Instance.ZhongDu;
+			Enemy.Instance.ZhongDu--;
+		}
         BattleUIManager._instance.UpdateEnemyState();
+		//坟场的牌进入ownedCard
+		for (int i = 0; i < Enemy.Instance.UsedCard.Count; i++)
+		{
+			string cardId = Enemy.Instance.UsedCard[i];
+			//如果这张卡是装备卡则不再进入卡包
+			if (cardId[1]=='z'&& cardId[2] == 'b')
+			{
+				continue;
+			}
+			Enemy.Instance.OwnedCard.Add(Enemy.Instance.UsedCard[i]);
+		}
+		//清空本回合打过的牌
+		Enemy.Instance.UsedCard.Clear();
     }
 
     /// <summary>
@@ -76,21 +117,8 @@ public class RoleOperation : Singleton<RoleOperation> {
         {
             Player.Instance.Fali = Player.Instance.ChushiFali;
         }
-        //坟场的牌进入ownedCard
-        for (int i = 0; i < Player.Instance.UsedCard.Count; i++)
-        {
-            string cardId = Player.Instance.UsedCard[i];
-            //是装备就不进
-            if (cardId[1]=='z'&& cardId[2] == 'b')
-            {
-                continue;
-            }
-            Player.Instance.OwnedCard.Add(Player.Instance.UsedCard[i]);
-        }
-        //清空本回合打过的牌
-        Player.Instance.UsedCard.Clear();
-        //重置玩家抽牌数量
-        Player.Instance.HuiheChoupai = 3;
+       //减伤归零
+		Player.Instance.JianShang=0;
     }
     /// <summary>
     /// 回合结束常规结算_敌人
@@ -105,19 +133,8 @@ public class RoleOperation : Singleton<RoleOperation> {
         {
             Enemy.Instance.Fali = Enemy.Instance.ChushiFali;
         }
-        //坟场的牌进入ownedCard
-        for (int i = 0; i < Enemy.Instance.UsedCard.Count; i++)
-            {
-                string cardId = Enemy.Instance.UsedCard[i];
-                //如果这张卡是装备卡则不再进入卡包
-                if (cardId[1]=='z'&& cardId[2] == 'b')
-                {
-                    continue;
-                }
-                Enemy.Instance.OwnedCard.Add(Enemy.Instance.UsedCard[i]);
-            }
-        //清空本回合打过的牌
-        Enemy.Instance.UsedCard.Clear();
+		//减伤归零
+		Enemy.Instance.JianShang=0; 
         //重置免伤
         CardFuncsCtrl.instance.forbidDamage = false;
     }
@@ -200,8 +217,6 @@ public class RoleOperation : Singleton<RoleOperation> {
     /// <param name="role">对象</param>
     public List<string> ChouPai(int cardCount,RoleBase role)
     {
-        //该回合抽牌数
-        cardCount = role.HuiheChoupai;
         //随机索引存储在列表
         List<int> randomIndex = new List<int>();
         for (int i = 0; i < cardCount; i++)
@@ -229,7 +244,7 @@ public class RoleOperation : Singleton<RoleOperation> {
         {
             role.HandCard.Add(cardId[i]);
         }
-        //待移除id的索引
+        //移除卡包中的该牌
         for (int i = 0; i < cardId.Count; i++)
         {
             int index = role.OwnedCard.IndexOf(cardId[i]);
@@ -240,9 +255,59 @@ public class RoleOperation : Singleton<RoleOperation> {
         {
             BattleRoundCtrl._instance.GenerateCard(cardId);
         }
+     
         return cardId;
     }
-    
+
+    /// <summary>
+    /// 从其他地方抽牌,比如坟场
+    /// </summary>
+    /// <param name="cardCount"></param>
+    /// <param name="role"></param>
+    /// <param name="targetList"></param>
+    /// <returns></returns>
+    public List<string> ChouPai(int cardCount, RoleBase role,List<string> targetList)
+    {
+        //随机索引存储在列表
+        List<int> randomIndex = new List<int>();
+        for (int i = 0; i < cardCount; i++)
+        {
+            while (true)
+            {
+                int index = UnityEngine.Random.Range(0, role.OwnedCard.Count);
+                if (randomIndex.Contains(index) == false)
+                {
+                    randomIndex.Add(index);
+                    break;
+                }
+            }
+        }
+        //获得对应索引卡的Id
+        List<string> cardId = new List<string>();
+        for (int i = 0; i < randomIndex.Count; i++)
+        {
+            int index = randomIndex[i];
+            cardId.Add(targetList[index]);
+        }
+        //添加至手牌List中
+        for (int i = 0; i < cardId.Count; i++)
+        {
+            role.HandCard.Add(cardId[i]);
+        }
+        //移除该牌
+        for (int i = 0; i < cardId.Count; i++)
+        {
+            int index = targetList.IndexOf(cardId[i]);
+            targetList.RemoveAt(index);
+        }
+        //如果对象是玩家,则顺便实例化手牌
+        if (role.Equals(Player.Instance))
+        {
+            BattleRoundCtrl._instance.GenerateCard(cardId);
+        }
+        return cardId;
+    }
+
     /// <summary>
     /// 出牌
     /// </summary>
@@ -273,6 +338,9 @@ public class RoleOperation : Singleton<RoleOperation> {
     {
         cpFuncs_player(cardId);
         Player.Instance.Damage = 0;
+        Player.Instance.FaliIncrease = 0;
+        Player.Instance.SuccessfulShanBi = false;
+        Player.Instance.ChuPaiYouXiao = true;
     }
     /// <summary>
     /// 出一张牌后结算_敌人
@@ -281,6 +349,9 @@ public class RoleOperation : Singleton<RoleOperation> {
     {
         cpFuncs_enemy(cardId);
         Enemy.Instance.Damage = 0;
+        Enemy.Instance.FaliIncrease = 0;
+        Enemy.Instance.SuccessfulShanBi = false;
+        Enemy.Instance.ChuPaiYouXiao = true;
     }
 
     /// <summary>
@@ -288,26 +359,27 @@ public class RoleOperation : Singleton<RoleOperation> {
     /// </summary>
     public void XuanZeQiPai()
     {
-        //判断是否弃牌,如果是,则弃牌
-        if (Player.Instance.HandCard.Count>Player.Instance.MaxCard)
-        {
-            //显示弃牌UI
-            BattleUIManager._instance.ShowQiPaiPanel();
-        }
-        else//不用弃牌则直接进入敌人回合
-        {
-            HuiheJieshu_Player();
-            BattleRoundCtrl._instance.whosRound = RoleRound.EnemyRound;
-        }
+            //判断是否弃牌,如果是,则弃牌
+            if (Player.Instance.HandCard.Count > Player.Instance.MaxCard)
+            {
+                //显示弃牌UI
+                BattleUIManager._instance.ShowQiPaiPanel();
+            }
+            else//不用弃牌则直接进入敌人回合
+            {
+                HuiheJieshu_Player();
+                BattleRoundCtrl._instance.whosRound = RoleRound.EnemyRound;
+            }
     }
 
-   
     /// <summary>
     /// 丢牌(被技能伤害)
     /// </summary>
     public void YiChuPaiId(RoleBase role)
     {
         int index = UnityEngine.Random.Range(0,role.HandCard.Count);
+		//加入坟场
+		role.UsedCard.Add(role.HandCard[index]);
         //移除list中的id
         role.HandCard.Remove(role.HandCard[index]);
     }
@@ -327,5 +399,7 @@ public class RoleOperation : Singleton<RoleOperation> {
     {
         jsFuncs_Enemy();
     }
+
+
 
 }

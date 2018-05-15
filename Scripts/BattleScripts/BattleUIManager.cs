@@ -69,7 +69,6 @@ public class BattleUIManager : MonoBehaviour
     //弃牌前往的位置
     [SerializeField]
     Transform removeCardPos;
-
     /// <summary>
     /// 敌人图片地址
     /// </summary>
@@ -108,7 +107,6 @@ public class BattleUIManager : MonoBehaviour
         queding_Btn.onClick.AddListener(
                 delegate ()
                 {
-                    Debug.Log(qipai_Content);
                     List<string> cardId = new List<string>();
                     foreach (Transform item in qipai_Content)
                     {
@@ -116,18 +114,19 @@ public class BattleUIManager : MonoBehaviour
                         if (item.GetComponent<Toggle>().isOn)
                         {
                             cardId.Add(item.GetComponent<CardUI_qipai>().cardId);
-                            Debug.Log("zhaodaole");
                         }
                     }
                     foreach (var item in cardId)
                     {
-                        Debug.Log("选中了的卡的id是"+item);
+					//弃牌加入坟场
+					Player.Instance.UsedCard.Add(item);
                     }
                     //移出对应手牌
                     StartCoroutine(QiPai(cardId));
                     GenerateQiPai._instance.DestroyAllQiPai();
                     qiPai_Panel.SetActive(false);
                     RoleOperation.Instance.HuiheJieshu_Player();
+					Debug.Log ("玩家结算完毕");
                     BattleRoundCtrl._instance.whosRound = RoleRound.EnemyRound;
                 }
             );
@@ -247,9 +246,10 @@ public class BattleUIManager : MonoBehaviour
     /// <summary>
     /// 更新BuffUI
     /// </summary>
-    public void UpdateBuffImg()
+    public void UpdateBuffImg(string id)
     {
         GameObject buffObj = Instantiate(buffPrefab);
+        buffObj.GetComponent<BuffUI>().buffId = id;
         //加入BuffPanel中
         buffObj.transform.SetParent(panel_Buff);
     }
@@ -257,9 +257,10 @@ public class BattleUIManager : MonoBehaviour
     /// <summary>
     /// 更新装备武器的UI
     /// </summary>
-    public void UpdateEquipmentImg()
+    public void UpdateEquipmentImg(string id)
     {
         GameObject equipmentObj = Instantiate(equipmentImgPrefab);
+        equipmentObj.GetComponent<EquipmentUI>().epId = id;
         equipmentObj.transform.SetParent(panel_Buff);
     }
     #endregion
@@ -285,28 +286,28 @@ public class BattleUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 打开弃牌界面
+    /// 打开弃牌界面(回合结束)
     /// </summary>
     public void ShowQiPaiPanel()
     {
         //打开panel
         qiPai_Panel.SetActive(true);
-        UpdateQiPaiInfo();
+        int qipaiCount = Player.Instance.HandCard.Count - Player.Instance.MaxCard;
+        UpdateQiPaiInfo(qipaiCount);
         //实例化待选卡
-        GenerateQiPai._instance.ShowQiPai();
+        GenerateQiPai._instance.ShowQiPai(qipaiCount);
     }
 
     /// <summary>
     /// 更新弃牌信息
     /// </summary>
-    public void UpdateQiPaiInfo()
+    public void UpdateQiPaiInfo(int count)
     {
-        int qipai = Player.Instance.HandCard.Count - Player.Instance.MaxCard;
         Debug.Log("手牌数:" + Player.Instance.HandCard.Count);
         Debug.Log("最大手牌数:" + Player.Instance.MaxCard);
-        qiPaiInfo_Text.text = string.Format("选择{0}张牌弃置\n当前手牌上限: {1}",qipai, Player.Instance.MaxCard);
+        qiPaiInfo_Text.text = string.Format("选择{0}张牌弃置\n当前手牌上限: {1}", count, Player.Instance.MaxCard);
     }
-
+    
     /// <summary>
     /// 弃牌
     /// </summary>

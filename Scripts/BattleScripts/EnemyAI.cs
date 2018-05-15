@@ -55,8 +55,10 @@ public class EnemyAI : MonoBehaviour {
             handCardTransform.GetChild(index).DOScale(6, 0.5f);
             yield return new WaitForSeconds(0.6f);
             handCardTransform.GetComponent<GridLayoutGroup>().enabled = true;
-            //出牌方法
-            RoleOperation.Instance.ChuPai(Enemy.Instance.HandCard[index]);
+            //如果出牌有效,则调用方法
+			if (Enemy.Instance.ChuPaiYouXiao) {
+				RoleOperation.Instance.ChuPai(Enemy.Instance.HandCard[index]);	
+			}
             //更新UI
             BattleUIManager._instance.UpdateEnemyAndPlayerState(0.5f);
             //销毁出的牌
@@ -64,12 +66,13 @@ public class EnemyAI : MonoBehaviour {
             //打光了break
             if (handCardTransform.childCount==1)
             {
-                Debug.Log("跳出");
                 break;
             }
         }
+		Debug.Log("跳出");
         //回合结算
         RoleOperation.Instance.HuiheJieshu_Enemy();
+		Debug.Log ("敌人结算完毕");
         //等一秒进入玩家回合
         yield return new WaitForSeconds(1f);
         BattleRoundCtrl._instance.whosRound = RoleRound.PlayerRound;

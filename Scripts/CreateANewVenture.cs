@@ -10,10 +10,6 @@ using UnityEngine.UI;
 public class CreateANewVenture:Singleton<CreateANewVenture>
 {
     /// <summary>
-    /// 新角色的初始卡包
-    /// </summary>
-    private List<string> newCardPackage;
-    /// <summary>
     /// 新档案
     /// </summary>
     public RecordData newRecordData;
@@ -30,30 +26,30 @@ public class CreateANewVenture:Singleton<CreateANewVenture>
         {
             case Occupation.knight:
                 //为新角色制造一个卡包
-                newCardPackage = CreateNewCardPackage(Occupation.knight);
+                List<string> newCardPackage_k = CreateNewCardPackage(Occupation.knight);
                 //初始化角色信息
-                newRecordData.CreateRoleData(Occupation.knight, 20, 20, 0, 2, 1, 0, 1, 2, 2, 0, 0, 10, newCardPackage, 1);
+                newRecordData.CreateRoleData(Occupation.knight, 20, 20, 0, 2, 1, 0, 1, 2, 2, 0, 0, 10, newCardPackage_k, 1);
                 break;
 
             case Occupation.Hunter:
                 //为新角色制造一个卡包
-                newCardPackage = CreateNewCardPackage(Occupation.knight);
+                List<string> newCardPackage_h = CreateNewCardPackage(Occupation.Hunter);
                 //初始化角色信息
-                newRecordData.CreateRoleData(Occupation.Hunter, 20, 20, 0, 2, 1, 0, 1, 2, 2, 0, 0, 10, newCardPackage, 2);
+                newRecordData.CreateRoleData(Occupation.Hunter, 20, 20, 0, 2, 1, 0, 1, 2, 2, 0, 0, 10, newCardPackage_h, 2);
                 break;
 
             case Occupation.Sorcerer:
                 //为新角色制造一个卡包
-                newCardPackage = CreateNewCardPackage(Occupation.knight);
+                List<string> newCardPackage_s = CreateNewCardPackage(Occupation.Sorcerer);
                 //初始化角色信息
-                newRecordData.CreateRoleData(Occupation.Sorcerer, 20, 20, 0, 2, 1, 1, 1, 2, 2, 0, 0, 10, newCardPackage, 3);
+                newRecordData.CreateRoleData(Occupation.Sorcerer, 20, 20, 0, 2, 1, 1, 1, 2, 2, 0, 0, 10, newCardPackage_s, 3);
                 break;
 
             case Occupation.Nun:
                 //为新角色制造一个卡包
-                newCardPackage = CreateNewCardPackage(Occupation.knight);
+                List<string> newCardPackage_n = CreateNewCardPackage(Occupation.Nun);
                 //初始化角色信息
-                newRecordData.CreateRoleData(Occupation.Nun, 20, 20, 0, 2, 1, 1, 1, 2, 2, 0, 0, 10, newCardPackage, 4);
+                newRecordData.CreateRoleData(Occupation.Nun, 20, 20, 0, 2, 1, 1, 1, 2, 2, 0, 0, 10, newCardPackage_n, 4);
                 break;
 
             default:
@@ -62,7 +58,7 @@ public class CreateANewVenture:Singleton<CreateANewVenture>
         #endregion
         Debug.Log("点击开始冒险按钮,newRecordData中的occupation值:"+newRecordData.PlayerOccupation);
         //初始化章节和关卡信息
-        newRecordData.InitialChapterData(1,2,3,"第一章: 新手村",21);
+        newRecordData.InitialChapterData(1, 2, 3, "第一章: 新手村", 21);
     }
 
     /// <summary>

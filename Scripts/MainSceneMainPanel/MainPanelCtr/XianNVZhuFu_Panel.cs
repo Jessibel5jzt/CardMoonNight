@@ -11,7 +11,7 @@ public class XianNVZhuFu_Panel : UIBase {
     }
     public override void DoOnPausing()
     {
-        this.gameObject.SetActive(true);
+        this.gameObject.SetActive(false);
     }
     public override void DoOnResuming()
     {

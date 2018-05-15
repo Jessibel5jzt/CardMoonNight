@@ -16,14 +16,18 @@ public class CardBuy : MonoBehaviour
     private Button BuyBtn;
     private Button closedBtn;
 
-    int OwnCardNum;
+    RefreshUI freshGold;
 
+    int OwnCardNum;
+    int thisCardPrice;
     private void Start()
     {
+        freshGold = new RefreshUI();
+
         LoadAllUIObject();
 
         cardId = this.transform.parent.name;
-        OwnCardNum = ShowCardInfo();
+        OwnCardNum = ShowCardInfo(out thisCardPrice);
 
         //购买
         BuyBtn = gameObject.transform.Find("BuyBtn").GetComponent<Button>();
@@ -35,16 +39,35 @@ public class CardBuy : MonoBehaviour
 
     }
 
-    private void BuyCard()
+    public void BuyCard()
     {
         OwnCardNum += 1;
         string sqlstBC = string.Format("UPDATE card set own = {0} where id = '{1}'", OwnCardNum, cardId);
-        AchieveUIManager.Instance.Dispatch(11000, this.transform.parent.name);
 
-        Destroy(this.transform.parent.gameObject);
+        if (CreateANewVenture.Instance.newRecordData.Gold >= thisCardPrice)
+        {
+            CreateANewVenture.Instance.newRecordData.Gold -= thisCardPrice;
+
+            print("买了买了，你还剩" + CreateANewVenture.Instance.newRecordData.Gold);
+
+            AchieveUIManager.Instance.Dispatch(11000, this.transform.parent.name);
+
+            //刷新主界面金币
+            freshGold.RefreshMainGold(CreateANewVenture.Instance.newRecordData);
+
+
+            Destroy(this.transform.parent.gameObject);
+        }
+        else
+        {
+            print("买不起，你只有" + CreateANewVenture.Instance.newRecordData.Gold);
+
+            print("攒点钱再来吧兄弟");
+        }
+
     }
 
-    private int ShowCardInfo()
+    private int ShowCardInfo(out int cardPrice)
     {
         //找到卡牌名字
         string sqlstC = string.Format("SELECT * FROM Card where id = '{0}'", cardId);
@@ -57,12 +80,17 @@ public class CardBuy : MonoBehaviour
         string CardFee = ThisCard[0][5].ToString();
         int CardStar = Convert.ToInt32(ThisCard[0][6]);
         int OwnNum = Convert.ToInt32(ThisCard[0][8]);
+        int CardPrice = Convert.ToInt32(ThisCard[0][9]);
         int CardMaxStar = Convert.ToInt32(ThisCard[0][11]);
 
         //传递卡牌信息至面板
         this.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = CardName;
         this.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<Text>().text = CardInfo;
         this.transform.GetChild(0).GetChild(4).GetChild(0).GetComponent<Text>().text = CardType;
+        this.transform.GetChild(2).GetChild(1).GetComponent<Text>().text = CardPrice.ToString();
+
+        cardPrice = CardPrice;
+
         if (CardMaxStar != 0)
         {
             //设置星星父物体

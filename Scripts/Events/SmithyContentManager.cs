@@ -9,23 +9,50 @@ public class SmithyContentManager : MonoBehaviour
     //铁匠铺卡牌
     public GameObject SmithyItem;
 
+    string a = "免费";
     //卡牌容器
     private Transform itemContent;
 
     void Start()
     {
-        ShowSmithyItem();
+        ShowSmithyItem(a);
+        AchieveUIManager.Instance.AddEventListener(20002, ShowSmithyItem);
     }
 
     /// <summary>
     /// 显示铁匠铺卡牌
     /// </summary>
-    void ShowSmithyItem()
+    void ShowSmithyItem(string s)
     {
-
         //找到卡牌容器
         itemContent = this.transform.GetComponentInChildren<GridLayoutGroup>().transform;
 
+
+        if (itemContent.childCount != 0)
+        {
+            foreach (Transform childTr in itemContent)
+            {
+                Debug.Log("childTr子物体名字：" + childTr.gameObject.name);
+                Destroy(childTr.gameObject);
+            }
+            if (s == "免费")
+            {
+                s = "10";
+            }
+            else if (s == "10")
+            {
+                s = "25";
+            }
+            else if (s == "25")
+            {
+                s = "45";
+            }
+            else
+            {
+                s = "45";
+            }
+        }
+        this.transform.parent.GetChild(1).GetComponentInChildren<Text>().text = string.Format("选择想要升级的卡 当前价格：{0}", s);
         //i = 星星数
         for (int i = 1; i < 3; i++)
         {

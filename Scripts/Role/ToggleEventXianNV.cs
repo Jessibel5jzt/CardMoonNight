@@ -6,8 +6,16 @@ using UnityEngine.UI;
 public class ToggleEventXianNV : MonoBehaviour {
     Toggle toggle;
     XianNVToggleGroupScr xntgs;
+    RefreshUI rui;
+    Button ExitBtn;
     // Use this for initialization
     void Start () {
+       rui = new RefreshUI();
+        ExitBtn = transform.parent.parent.parent.Find("Button").GetComponent<Button>();
+        ExitBtn.onClick.AddListener(()=> {
+            UIManager.Instance.PopUIPanel();
+            UIManager.Instance.PushUIPanel("MainSceneMainPanel");
+        });
         xntgs = transform.GetComponentInParent<XianNVToggleGroupScr>();
         toggle =  this.transform.GetComponent<Toggle>();
         toggle.onValueChanged.AddListener((bool value) => {
@@ -19,23 +27,24 @@ public class ToggleEventXianNV : MonoBehaviour {
                     transform.parent.parent.Find("MiaoShu_Text").GetComponent<Text>().text = xntgs.str1;
                     JudgeType(xntgs.addValue[0]);
                     print("jice");
-                    toggle.onValueChanged.RemoveAllListeners();
+                    //toggle.onValueChanged.RemoveAllListeners();
                     break;
                 case "Toggle (1)":
                     transform.parent.parent.Find("MiaoShu_Text").GetComponent<Text>().text = xntgs.str2;
                     JudgeType(xntgs.addValue[1]);
                     print("jice");
-                    toggle.onValueChanged.RemoveAllListeners();
+                    //toggle.onValueChanged.RemoveAllListeners();
                     break;
                 case "Toggle (2)":
                     transform.parent.parent.Find("MiaoShu_Text").GetComponent<Text>().text = xntgs.str3;
                     JudgeType(xntgs.addValue[2]);
                     print("jice");
-                    toggle.onValueChanged.RemoveAllListeners();
+                    //toggle.onValueChanged.RemoveAllListeners();
                     break;
                 default:
                     break;
             }
+            toggle.onValueChanged.RemoveAllListeners();
           
         });
 	}
@@ -51,34 +60,29 @@ public class ToggleEventXianNV : MonoBehaviour {
             {
                 case "生命":
                     CreateANewVenture.Instance.newRecordData.MaxHealth += s;
-                    btn.onClick.RemoveAllListeners();
+                    CreateANewVenture.Instance.newRecordData.Health += s;
                     print(CreateANewVenture.Instance.newRecordData.MaxHealth + "ijkjjhiouhiu");
                     break;
                 case "经验":
                     CreateANewVenture.Instance.newRecordData.Exp += s;
-                    btn.onClick.RemoveAllListeners();
                     print(CreateANewVenture.Instance.newRecordData.Exp + "ijkjjhiouhiu");
                     break;
                 case "魔法":
                     CreateANewVenture.Instance.newRecordData.ChushiFali += s;
-                    btn.onClick.RemoveAllListeners();
                     print(CreateANewVenture.Instance.newRecordData.ChushiFali + "ijkjjhiouhiu");
                     break;
                 case "勇气":
                     CreateANewVenture.Instance.newRecordData.Courage += s;
 
-                    btn.onClick.RemoveAllListeners();
                     print(CreateANewVenture.Instance.newRecordData.Courage + "ijkjjhiouhiu");
                     break;
                 case "金钱":
                     CreateANewVenture.Instance.newRecordData.Gold += s;
-                    btn.onClick.RemoveAllListeners();
                     print(CreateANewVenture.Instance.newRecordData.Gold + "ijkjjhiouhiu");
 
                     break;
                 case "行动力":
                     CreateANewVenture.Instance.newRecordData.ChushiXingdong += s;
-                    btn.onClick.RemoveAllListeners();
                     print(CreateANewVenture.Instance.newRecordData.ChushiXingdong + "ijkjjhiouhiu");
 
                     break;
@@ -86,14 +90,12 @@ public class ToggleEventXianNV : MonoBehaviour {
                 default:
                     break;
             }
-            UIManager.Instance.PopUIPanel();
-
+            btn.onClick.RemoveAllListeners();
+            rui.RefreshMainGold(CreateANewVenture.Instance.newRecordData);
+            UIManager.Instance.PushUIPanel("MainSceneMainPanel");
+            
         });
 
     }
-    private void OnDestroy()
-    {
-        
-    }
-
+  
 }

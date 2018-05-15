@@ -14,7 +14,6 @@ public class GenerateQiPai : MonoBehaviour {
     public int chosedCount = 0;
     //弃牌Id
     public List<string> qipaiId = new List<string>();
-    //确认弃牌按钮
     [SerializeField]
     Button quidingBtn;
 
@@ -27,15 +26,14 @@ public class GenerateQiPai : MonoBehaviour {
     
 	void Start () {
         qipaiCount = Player.Instance.HandCard.Count - Player.Instance.MaxCard;
-     
     }
 	
     /// <summary>
     /// 显示弃牌
     /// </summary>
-	public void ShowQiPai()
+	public void ShowQiPai(int qipaiCount)
     {
-            qipaiCount= Player.Instance.HandCard.Count - Player.Instance.MaxCard;
+        this.qipaiCount = qipaiCount;
             chosedCount = 0;
             //弃牌Id
             qipaiId = new List<string>();
@@ -55,7 +53,7 @@ public class GenerateQiPai : MonoBehaviour {
         //把确定按钮设为不可用
         quidingBtn.GetComponent<Button>().interactable = false;
     }
-
+    
     /// <summary>
     /// 销毁所有弃牌(点取消时)
     /// </summary>

@@ -22,7 +22,6 @@ public class XianNVToggleGroupScr : MonoBehaviour {
        str2 = ZhuFuFunc(1);
        str3= ZhuFuFunc(2);
        miaoShuTxt.text = "";
-
     }
     List<int> listNum = new List<int> ();
     string ZhuFuFunc(int i)

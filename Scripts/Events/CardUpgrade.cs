@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class CardUpgrade : MonoBehaviour
 {
 
+
     string cardId;
     string newCardId;
     public string ResourcesDir = "AchievePanel/Card/BigCard/BigStar";
@@ -17,10 +18,15 @@ public class CardUpgrade : MonoBehaviour
     private Button upgradeBtn;
     private Button closedBtn;
 
+    RefreshUI freshGold;
+
     void Start()
     {
         //加载预设体
         LoadAllUIObject();
+
+        freshGold = new RefreshUI();
+
         //当前卡牌id
         cardId = this.transform.parent.name;
 
@@ -31,7 +37,27 @@ public class CardUpgrade : MonoBehaviour
         newCardId = cardId.Remove(5, 1) + change.ToString();
 
         //升级
-        UpgradeCardOperate();
+        ShowUpgradeCard();
+
+        //刷新金币数
+        string readPrice = this.transform.parent.parent.Find("TieJiangPu_Panel(Clone)").GetChild(1).GetComponentInChildren<Text>().text;
+
+        if (readPrice == "选择想要升级的卡 当前价格：免费")
+        {
+            this.transform.GetChild(3).GetComponentInChildren<Text>().text = "免费";
+        }
+        else if (readPrice == "选择想要升级的卡 当前价格：10")
+        {
+            this.transform.GetChild(3).GetComponentInChildren<Text>().text = "10";
+        }
+        else if (readPrice == "选择想要升级的卡 当前价格：25")
+        {
+            this.transform.GetChild(3).GetComponentInChildren<Text>().text = "25";
+        }
+        else
+        {
+            this.transform.GetChild(3).GetComponentInChildren<Text>().text = "45";
+        }
 
         //升级按钮
         upgradeBtn = gameObject.transform.Find("UpgradeBtn").GetComponent<Button>();
@@ -42,7 +68,7 @@ public class CardUpgrade : MonoBehaviour
         closedBtn.onClick.AddListener(() => { ClosedCardPanel(); });
     }
 
-    private void UpgradeCardOperate()
+    private void ShowUpgradeCard()
     {
         ShowFirstCards();
         ShowSecondCard();
@@ -53,41 +79,58 @@ public class CardUpgrade : MonoBehaviour
     /// </summary>
     private void UpCard()
     {
-        //数据库当前卡牌own-1
-        string sqlstrO = string.Format("select own from Card where id = '{0}'", cardId);
-        int countON = Convert.ToInt32(ShareDataBase.sDb.SelectFiledSql(sqlstrO));
-        //print(countON);
-        countON -= 1;
-        string sqlstrOD = string.Format("update Card set own = {0} where id = '{1}'", countON, cardId);
-        ShareDataBase.sDb.ExecSql(sqlstrOD);
+        if (judgementUpgrade())
+        {
+            //数据库当前卡牌own-1
+            string sqlstrO = string.Format("select own from Card where id = '{0}'", cardId);
+            int countON = Convert.ToInt32(ShareDataBase.sDb.SelectFiledSql(sqlstrO));
+            //print(countON);
+            countON -= 1;
+            string sqlstrOD = string.Format("update Card set own = {0} where id = '{1}'", countON, cardId);
+            ShareDataBase.sDb.ExecSql(sqlstrOD);
 
 
-        //数据库升级卡牌own+1
-        string sqlstrU = string.Format("select own from Card where id = '{0}'", newCardId);
-        int countUN = Convert.ToInt32(ShareDataBase.sDb.SelectFiledSql(sqlstrU));
-        //print(countUN);
-        countUN += 1;
-        string sqlstrUO = string.Format("update Card set own = {0} where id = '{1}'", countUN, newCardId);
-        ShareDataBase.sDb.ExecSql(sqlstrUO);
+            //数据库升级卡牌own+1
+            string sqlstrU = string.Format("select own from Card where id = '{0}'", newCardId);
+            int countUN = Convert.ToInt32(ShareDataBase.sDb.SelectFiledSql(sqlstrU));
+            //print(countUN);
+            countUN += 1;
+            string sqlstrUO = string.Format("update Card set own = {0} where id = '{1}'", countUN, newCardId);
+            ShareDataBase.sDb.ExecSql(sqlstrUO);
+
+            //播放升级动画
+            GetComponentInChildren<Animation>().Play("CardUpgrade");
+
+            //关闭界面杂物
+            this.transform.GetChild(0).gameObject.SetActive(false);
+            this.transform.GetChild(1).GetComponent<Image>().enabled = false;
+            this.transform.GetChild(2).gameObject.SetActive(false);
+            this.transform.GetChild(3).gameObject.SetActive(false);
+            this.transform.GetChild(4).gameObject.SetActive(false);
+            this.transform.GetChild(5).gameObject.SetActive(false);
+
+            //Destroy(this.transform.parent.parent.Find("TieJiangPu_Panel(Clone)").gameObject);
+
+            AchieveUIManager.Instance.Dispatch(11000, this.name);
+
+            if (this.transform.GetChild(3).GetComponentInChildren<Text>().text != "免费")
+            {
+                CreateANewVenture.Instance.newRecordData.Gold -= Convert.ToInt32(this.transform.GetChild(3).GetComponentInChildren<Text>().text);
+            }
+            //刷新主界面金币
+            freshGold.RefreshMainGold(CreateANewVenture.Instance.newRecordData);
+
+            //刷新界面
+            AchieveUIManager.Instance.Dispatch(20002, this.transform.GetChild(3).GetComponentInChildren<Text>().text);
+
+            Destroy(this.transform.parent.gameObject, 2);
+        }
+        else
+        {
+            print("钱不够");
+        }
 
 
-
-        //播放升级动画
-        GetComponentInChildren<Animation>().Play("CardUpgrade");
-
-        //关闭界面杂物
-        this.transform.GetChild(0).gameObject.SetActive(false);
-        this.transform.GetChild(1).GetComponent<Image>().enabled = false;
-        this.transform.GetChild(2).gameObject.SetActive(false);
-        this.transform.GetChild(3).gameObject.SetActive(false);
-        this.transform.GetChild(4).gameObject.SetActive(false);
-        this.transform.GetChild(5).gameObject.SetActive(false);
-
-        // Destroy(this.transform.parent.parent.Find("TieJiangPu_Panel(Clone)").gameObject);
-
-        AchieveUIManager.Instance.Dispatch(11000, this.name);
-
-        Destroy(this.transform.parent.gameObject, 2);
     }
 
     /// <summary>
@@ -160,6 +203,28 @@ public class CardUpgrade : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 判断能否升级
+    /// </summary>
+    /// <returns></returns>
+    bool judgementUpgrade()
+    {
+        if (this.transform.GetChild(3).GetComponentInChildren<Text>().text != "免费")
+        {
+            if (CreateANewVenture.Instance.newRecordData.Gold < Convert.ToInt32(this.transform.GetChild(3).GetComponentInChildren<Text>().text))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
 
     /// <summary>
     /// 关闭整个CardPanel

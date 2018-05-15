@@ -7,13 +7,9 @@ public class InitialMainPanel : MonoBehaviour {
   
     //血条
     [SerializeField]
-    Slider sliderHealth;
+    Transform sliderHealth;
     private Text healthText;
-    //经验条
-    [SerializeField]
-    Slider sliderExp;
-    private Text expText;
-    private Text lvlText;
+    
     //基础法力
     [SerializeField]
     Text faliText;
@@ -39,7 +35,11 @@ public class InitialMainPanel : MonoBehaviour {
     [SerializeField]
     Text lastPageText;
 
-
+    //经验条
+    [SerializeField]
+    Image sliderExp;
+    private Text expValue;
+    private Text lvlText;
     private RecordData newRecordData;
 
     void Start () {
@@ -52,11 +52,15 @@ public class InitialMainPanel : MonoBehaviour {
        
         GameObject root = GameObject.Find("UIManager");
         newRecordData = CreateANewVenture.Instance.newRecordData;
-        //Debug.Log(newRecordData);
-        //Debug.Log("寻找CreateANewVenture中的newRecordData:" + newRecordData.PlayerOccupation);
-        healthText = sliderHealth.transform.Find("healthValue").GetComponent<Text>();
-        expText = sliderExp.transform.Find("expValue").GetComponent<Text>();
-        lvlText= sliderExp.transform.Find("Text_lvl").GetComponent<Text>();
+     
+        // 血条
+        healthText = sliderHealth.transform.parent.Find("healthValue").GetComponent<Text>();
+
+        // 经验条
+        sliderExp= transform.Find("Panel_BottomInfo/Exp_image/Slider_Exp").GetComponent<Image>();
+        expValue = sliderExp.transform.parent.Find("expValue").GetComponent<Text>();
+        lvlText= sliderExp.transform.parent.Find("Text_lvl").GetComponent<Text>();
+
         //初始化底部和顶部信息栏
         InitialBottomPanel();
         InitialTopPanel();
@@ -76,14 +80,20 @@ public class InitialMainPanel : MonoBehaviour {
     /// </summary>
     private void InitialSliderHealthAndExp()
     {
-        Debug.Log(newRecordData.MaxHealth);
-        sliderHealth.maxValue = newRecordData.MaxHealth;
-        sliderHealth.value = newRecordData.Health;
-        sliderExp.maxValue = newRecordData.MaxExp;
-        sliderExp.value = newRecordData.Exp;
+        //Debug.Log(newRecordData.MaxHealth);
+
+        //==========
+
+        //sliderHealth.maxValue = newRecordData.MaxHealth;
+        //sliderHealth.value = newRecordData.Health;
+        sliderHealth.GetComponent<Image>().fillAmount = 1;
+        sliderExp.fillAmount = 0;
+
         //更新UI上的数值
-        healthText.text = string.Format("{0}/{1}", sliderHealth.value, sliderHealth.maxValue);
-        expText.text = string.Format("{0}/{1}", sliderExp.value, sliderExp.maxValue);
+
+        //==========
+       healthText.text = string.Format("{0}/{1}", newRecordData.Health, newRecordData.MaxHealth);
+        expValue.text = string.Format("{0}/{1}", newRecordData.Exp, newRecordData.MaxExp);
         lvlText.text = string.Format("Lv."+newRecordData.Lvl);
     }
 

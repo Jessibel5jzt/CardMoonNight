@@ -20,7 +20,9 @@ public class ShowBigCard : MonoBehaviour
     }
     void Start()
     {
+        //加载所有预制体
         LoadAllUIObject();
+
         //查找在Canvas下节点位置
         for (int i = 0; i < this.transform.parent.childCount; i++)
         {
@@ -59,19 +61,34 @@ public class ShowBigCard : MonoBehaviour
                     CardCollection();
                 }
                 break;
+            //忘忧酒店
             case "WangYouJiuDian_Panel(Clone)":
                 JiudianPanel();
+                break;
+            //卡牌收藏家    
+            case "KaiPaiShouCangJia_Panel(Clone)":
+                CollectorPanel();
                 break;
             default:
                 break;
         }
     }
 
+    /// <summary>
+    /// 卡牌收藏家调出画面
+    /// </summary>
+    void CollectorPanel()
+    {
+        GetUIBase("CardCollectorExchange");
+    }
+
+    /// <summary>
+    /// 忘忧酒店调出画面
+    /// </summary>
     void JiudianPanel()
     {
         GetUIBase("CardHotel");
     }
-
 
     /// <summary>
     /// 铁匠铺调出画面
@@ -109,6 +126,7 @@ public class ShowBigCard : MonoBehaviour
 
 
 
+
     /// <summary>
     /// 生成UI界面
     /// </summary>
@@ -130,6 +148,9 @@ public class ShowBigCard : MonoBehaviour
                 break;
             case "CardShopBuy":
                 UIObject.AddComponent<CardBuy>();
+                break;
+            case "CardCollectorExchange":
+                UIObject.AddComponent<CardExchange>();
                 break;
             default:
                 break;

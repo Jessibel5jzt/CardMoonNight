@@ -14,6 +14,10 @@ public class RoleBase
     private int jianshang;
     private int zhongdu;
     private int ksShanghai;
+	private int didang;
+	private int hanleng;
+	private int huoDamageIncrease;
+	private bool chupaiyouxiao=true;
 
     /// <summary>
     /// 回合开始初始法力值
@@ -45,9 +49,15 @@ public class RoleBase
         }
         set
         {
+			//不能小于0大于最大生命值
             if (value<0)
             {
                 health = 0;
+                return;
+            }
+            if (value > MaxHealth)
+            {
+                health = MaxHealth;
                 return;
             }
             health = value;
@@ -116,7 +126,18 @@ public class RoleBase
     /// <summary>
     /// 抵挡
     /// </summary>
-    public int Didang { get; set; }
+	public int Didang{
+		get{ 
+			return didang;
+		}
+		set{ 
+			if (value<0) {
+				didang = 0;
+				return;
+			}
+			didang = value;
+		}
+	}
     /// <summary>
     /// 当前手牌
     /// </summary>
@@ -248,4 +269,54 @@ public class RoleBase
     /// 默认闪避为0
     /// </summary>
     public int MorenShanBi { get; set; }
+    /// <summary>
+    /// 成功闪避
+    /// </summary>
+    public bool SuccessfulShanBi { get; set; }
+    /// <summary>
+    /// 出牌是否有效
+    /// </summary>
+    /// <value><c>true</c> 出牌有效; otherwise,出牌无效 <c>false</c>.</value>
+    public bool ChuPaiYouXiao{
+		get{ 
+			return chupaiyouxiao;
+		}
+		set{ 
+			chupaiyouxiao = value;
+		}
+	}
+	/// <summary>
+	/// 火属性伤害加成
+	/// </summary>
+	public int HuoDamageIncrease {
+		get { 
+			return huoDamageIncrease;
+		}
+		set { 
+			if (value < 0) {
+				huoDamageIncrease = 0;
+				return;
+			}
+			huoDamageIncrease = value;
+		}
+	}
+	/// <summary>
+	/// 寒冷层数
+	/// </summary>
+	public int HanLeng{
+		get{ 
+			return hanleng;
+		}
+		set{ 
+			if (value<0) {
+				hanleng = 0;
+				return;
+			}
+			hanleng = value;
+		}
+	}
+    /// <summary>
+    /// 法力增加
+    /// </summary>
+    public int FaliIncrease { get; set; }
 }

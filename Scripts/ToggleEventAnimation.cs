@@ -213,8 +213,8 @@ public class ToggleEventAnimation : MonoBehaviour
         openNextPageBool = true;
         this.transform.GetComponent<Image>().material.SetFloat("_DissolveAmount", 1);
     }
-  
 
+    RefreshUI rui = new RefreshUI();
     // 判断选择的是哪个 panel
     void SelectPanel()
     {
@@ -226,7 +226,8 @@ public class ToggleEventAnimation : MonoBehaviour
                 UIManager.Instance.PushUIPanel("KaiPaiShouCangJia_Panel");
                 break;
             case "生命之泉":
-                CreateANewVenture.Instance.newRecordData.Health = CreateANewVenture.Instance.newRecordData.Health;
+                CreateANewVenture.Instance.newRecordData.Health = CreateANewVenture.Instance.newRecordData.MaxHealth;
+                rui.RefreshMainGold(CreateANewVenture.Instance.newRecordData);
                 break;
             case "药剂大师":
                 UIManager.Instance.PushUIPanel("YaoJiDaShi_Panel");
@@ -244,15 +245,26 @@ public class ToggleEventAnimation : MonoBehaviour
                 UIManager.Instance.PushUIPanel("LaoMaoShangDianPanel");
                 break;
             case "害羞的宝箱":
-                UIManager.Instance.PushUIPanel("KaiPaiShouCangJia_Panel");
+                UIManager.Instance.PushUIPanel("HaiXiuDeBaoXiang_Panel");
                 break;
             case "下一个路口":
                 print("下一个路口");
                 break;
             case "绷带":
-                CreateANewVenture.Instance.newRecordData.Health += CreateANewVenture.Instance.newRecordData.Lvl + 2;
-                int i = CreateANewVenture.Instance.newRecordData.Lvl + 2;
-                print("绷带+"+i.ToString());
+                int i = CreateANewVenture.Instance.newRecordData.Health;
+                int i1 = CreateANewVenture.Instance.newRecordData.MaxHealth;
+                int i2 = CreateANewVenture.Instance.newRecordData.Lvl + 2;
+                if (i + i2 > i1)
+                {
+                    CreateANewVenture.Instance.newRecordData.Health = CreateANewVenture.Instance.newRecordData.MaxHealth;
+                }
+                else {
+                    CreateANewVenture.Instance.newRecordData.Health += (CreateANewVenture.Instance.newRecordData.Lvl + 2);
+                }
+                
+                rui.RefreshMainGold(CreateANewVenture.Instance.newRecordData);
+
+
                 break;
             default:
                 // 如果是怪物的话,则进入此界面
@@ -269,7 +281,7 @@ public class ToggleEventAnimation : MonoBehaviour
     string[] enemy5 = { "qgjc01", "xqdc02", "fflc01", "fflb01", "tzba02", "fzsa11" };
     string[] enemy6 = { "qgjc01", "fzsb03", "fzsc01", "txdc010", "txdc03", "fzba01", "fflb02" };
     // 攻击多
-    string[] enemy7 = { "qgjc01", "qgjc03", "lgjc03", "攻击卡", "tgjb05", "qgjb01", "qgjb02", "qgjb03", "txdb02", "lxdb02", "lxda02" };
+    string[] enemy7 = { "qgjc01", "qgjc03", "lgjc03", "tgjb05", "tgjb05", "qgjb01", "qgjb02", "qgjb03", "txdb02", "lxdb02", "lxda02" };
     // 咒术多
     string[] enemy8 = { "qgjc01", "fzsa18", "fzsa17", "fzsb10", "fzsb11", "fzsb10", "fflb08", "fflb06", "fflc01", "fflc03", "fflb01" };
     // 装备多

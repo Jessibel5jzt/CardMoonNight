@@ -86,10 +86,7 @@ public class InitalizeChapterPage : MonoBehaviour
         {
             ran = Random.Range(1, 4);
         }
-        if (listInt.Contains(ran))
-        {
-            ran = Random.Range(1, 4);
-        }
+
         switch (ran)
         {
             case 1:
@@ -117,10 +114,7 @@ public class InitalizeChapterPage : MonoBehaviour
     {
         string BossStr = "";
         int ran = Random.Range(1, 4);
-        //while (listNum2.Contains(ran))
-        //{
-        //    ran = Random.Range(1, 4);
-        //}
+
         if (listNum2.Contains(ran))
         {
             ran = Random.Range(1, 4);
@@ -137,18 +131,15 @@ public class InitalizeChapterPage : MonoBehaviour
         {
             ran = Random.Range(1, 4);
         }
-        if (listInt.Contains(ran))
+        if (listNum2.Contains(ran))
         {
             ran = Random.Range(1, 4);
         }
-        if (listInt.Contains(ran))
+        if (listNum2.Contains(ran))
         {
             ran = Random.Range(1, 4);
         }
-        if (listInt.Contains(ran))
-        {
-            ran = Random.Range(1, 4);
-        }
+
         print(ran + "-----");
         switch (ran)
         {
@@ -192,26 +183,19 @@ public class InitalizeChapterPage : MonoBehaviour
         {
             ran = Random.Range(1, 4);
         }
+        if (listNum3.Contains(ran))
+        {
+            ran = Random.Range(1, 4);
+        }
         if (listInt.Contains(ran))
         {
             ran = Random.Range(1, 4);
         }
-        if (listNum3.Contains(ran))
+        if (listInt.Contains(ran))
         {
             ran = Random.Range(1, 4);
         }
-        if (listNum3.Contains(ran))
-        {
-            ran = Random.Range(1, 4);
-        }
-        if (listNum3.Contains(ran))
-        {
-            ran = Random.Range(1, 4);
-        }
-        if (listNum3.Contains(ran))
-        {
-            ran = Random.Range(1, 4);
-        }
+
         switch (ran)
         {
             case 1:

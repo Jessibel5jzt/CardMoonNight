@@ -63,7 +63,8 @@ public class NewGamePanelBtnCtr : EveryPanelBtnOnclickCtr {
                 SceneManager.LoadScene("MainScene");
                 UIManager.Instance.PushUIPanel("MainSceneMainPanel");
                 
-               
+                CreateANewVenture.Instance.CreateANewRecordData(opt);
+
                 break;
             case 5:
                 // 该panel下按钮5点击事件
