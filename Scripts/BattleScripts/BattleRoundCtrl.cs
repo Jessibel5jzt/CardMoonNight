@@ -43,9 +43,29 @@ public class BattleRoundCtrl : MonoBehaviour {
         _instance = this;
     }
 
-    void Start()
+    void OnEnable()
     {  
-        whosRound = RoleRound.PlayerRound;	
+        whosRound = RoleRound.PlayerRound;
+        MeiJiePai_Player = true;
+        MeiDaPai_Enemy = true;
+        MeiJiePai_Enemy = true;
+
+        RecordData currentData = CreateANewVenture.Instance.newRecordData;
+        Player.Instance.MaxHealth = currentData.MaxHealth;
+        Player.Instance.Fali = currentData.ChushiFali;//当前法力=初始法力
+        Player.Instance.ChushiFali = currentData.ChushiFali;
+        Player.Instance.XingdongLi = currentData.ChushiXingdong;//当前行动力=初始行动力
+        Player.Instance.ChushiXingdong = currentData.ChushiXingdong;
+        Player.Instance.HandCard = new List<string>();
+        Player.Instance.OwnedCard = currentData.OwnedCard;
+        Player.Instance.Equipments = new List<string>();
+        Player.Instance.UsedCard = new List<string>();
+        Player.Instance.HuiheChoupai = currentData.MeihuiheChoupai;
+        Player.Instance.MaxCard = currentData.ShoupaiShangxian;
+        Player.Instance.Damage = 0;
+        Player.Instance.MorenShanBi = 0;
+        
+        BattleUIManager._instance.UpdateEnemyAndPlayerState(0.01f);
     } 
 
     void Update()
@@ -60,6 +80,7 @@ public class BattleRoundCtrl : MonoBehaviour {
             StartCoroutine(BattleUIManager._instance.UpdateGameOverImage());
             return;
         }
+
             switch (whosRound)
             {
                 case RoleRound.PlayerRound:
@@ -68,17 +89,9 @@ public class BattleRoundCtrl : MonoBehaviour {
                     //玩家回合开始字样
                         StartCoroutine(BattleUIManager._instance.RoundBegin());
                     // 玩家接牌
-                    Debug.Log("接牌前:卡包的卡:" + Player.Instance.OwnedCard.Count);
-                    Debug.Log("接牌前:手牌的卡:" + Player.Instance.HandCard.Count);
-                    Debug.Log("接牌前:坟场的卡:" + Player.Instance.UsedCard.Count);
                     StartCoroutine(GetHandCards());
-                    Debug.Log("接牌后:卡包的卡:" + Player.Instance.OwnedCard.Count);
-                    Debug.Log("接牌后:手牌的卡:" + Player.Instance.HandCard.Count);
-                    Debug.Log("接牌后:坟场的卡:" + Player.Instance.UsedCard.Count);
-                    Debug.Log ("接牌完毕,进入玩家回合,准备回合开始的结算@");
 				//回合开始结算
 				RoleOperation.Instance.HuiheKaishi_Player();
-				Debug.Log ("玩家回合开始结算完毕@");
                         MeiJiePai_Player = false;
                         MeiJiePai_Enemy = true;
                         MeiDaPai_Enemy = true;

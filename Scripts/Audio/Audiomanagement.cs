@@ -16,7 +16,7 @@ public class Audiomanagement : MonoBehaviour {
         //获取背景音效组件
         Click_Audio_Source = GameObject.Find("Click_Audio_Source").GetComponent<AudioSource>();
         //获取点击音效组件
-      //   B_Beginplay_Audio("bei_jing_yin_yue");
+         B_Beginplay_Audio("bei_jing_yin_yue");
         //初始赋值背景音乐          调用方法
 
     }

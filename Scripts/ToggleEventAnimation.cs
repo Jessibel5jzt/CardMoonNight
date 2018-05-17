@@ -58,10 +58,10 @@ public class ToggleEventAnimation : MonoBehaviour
                 this.transform.GetChild(2).gameObject.SetActive(true);
                 this.transform.GetChild(3).gameObject.SetActive(true);
                 this.transform.GetChild(5).gameObject.SetActive(true);
-               
+
                 this.transform.GetComponent<Image>().material.SetFloat("_DissolveAmount", 0);
                 this.transform.GetComponent<Image>().material = null;
-             
+
             }
             if (secondTimer < 0)
             {
@@ -79,21 +79,21 @@ public class ToggleEventAnimation : MonoBehaviour
     /// </summary>
     public void AniamtionCtrl()
     {
-       
+
         if (this.GetComponent<Toggle>().isOn)
         {
-                //慢慢浮现出"战斗",改变toggle的外观,使怪物开始动
-                transform.Find("Button_fight").gameObject.SetActive(true);
-                transform.Find("Toggle_EventExitBtn").gameObject.SetActive(true);
-                if (this.transform.GetChild(2).GetComponent<Text>().text == "中国远古龙")
-                {
-                    transform.Find("Toggle_EventExitBtn").gameObject.SetActive(false);
-                }
-            
-                 //tempToggleNum = this.transform.name;
-                 //transform.Find("Toggle_EventExitBtn").GetComponent<Button>().onClick.AddListener(()=> { SendTempToggle(tempToggleNum); });
-                transform.Find("Toggle_EventExitBtn").GetComponent<Button>().onClick.AddListener(ChangeMaterial);
-                transform.Find("Button_fight").GetComponent<Button>().onClick.AddListener(ButtonFightBtn);
+            //慢慢浮现出"战斗",改变toggle的外观,使怪物开始动
+            transform.Find("Button_fight").gameObject.SetActive(true);
+            transform.Find("Toggle_EventExitBtn").gameObject.SetActive(true);
+            if (this.transform.GetChild(2).GetComponent<Text>().text == "中国远古龙")
+            {
+                transform.Find("Toggle_EventExitBtn").gameObject.SetActive(false);
+            }
+
+            //tempToggleNum = this.transform.name;
+            //transform.Find("Toggle_EventExitBtn").GetComponent<Button>().onClick.AddListener(()=> { SendTempToggle(tempToggleNum); });
+            transform.Find("Toggle_EventExitBtn").GetComponent<Button>().onClick.AddListener(ChangeMaterial);
+            transform.Find("Button_fight").GetComponent<Button>().onClick.AddListener(ButtonFightBtn);
             // 退出调用此方法
         }
         else
@@ -106,7 +106,7 @@ public class ToggleEventAnimation : MonoBehaviour
         }
 
     }
-   
+
     // 战斗按钮事件
     void ButtonFightBtn()
     {
@@ -116,8 +116,8 @@ public class ToggleEventAnimation : MonoBehaviour
 
     void SendTempToggle(string s)
     {
-        transform.parent.Find( s + "/Toggle_EventExitBtn").GetComponent<Button>().onClick.AddListener(ChangeMaterial);
-        transform.parent.Find( s + "/Button_fight").GetComponent<Button>().onClick.AddListener(ButtonFightBtn);
+        transform.parent.Find(s + "/Toggle_EventExitBtn").GetComponent<Button>().onClick.AddListener(ChangeMaterial);
+        transform.parent.Find(s + "/Button_fight").GetComponent<Button>().onClick.AddListener(ButtonFightBtn);
     }
     // 该表材质球
     void ChangeMaterial()
@@ -163,7 +163,7 @@ public class ToggleEventAnimation : MonoBehaviour
         shengXiaPage--;
         PlayerPrefs.SetInt("shengXiaPage", shengXiaPage);
         ShowLastPage();
-       
+
 
     }
     /// <summary>
@@ -258,10 +258,11 @@ public class ToggleEventAnimation : MonoBehaviour
                 {
                     CreateANewVenture.Instance.newRecordData.Health = CreateANewVenture.Instance.newRecordData.MaxHealth;
                 }
-                else {
+                else
+                {
                     CreateANewVenture.Instance.newRecordData.Health += (CreateANewVenture.Instance.newRecordData.Lvl + 2);
                 }
-                
+
                 rui.RefreshMainGold(CreateANewVenture.Instance.newRecordData);
 
 
@@ -269,32 +270,42 @@ public class ToggleEventAnimation : MonoBehaviour
             default:
                 // 如果是怪物的话,则进入此界面
                 // 敌人战斗开始初始化
+                Debug.Log("要打的怪的名字"+selectStr);
                 InitializeEnemy(selectStr);
+                UIManager.Instance.PopUIPanel();
                 UIManager.Instance.PushUIPanel("Battle_Panel");
                 break;
         }
     }
-    string[] enemy1 = { "qgjc01", "lgjc01", "xgjc01", "fgjc01" };
-    string[] enemy2 = { "qgjc01", "fgjc02", "xgjc03", "tgjb13" };
-    string[] enemy3 = { "qgjc01", "tgjb05", "qgjb06", "fzsb13" };
-    string[] enemy4 = { "qgjc01", "fflc01", "qxda01", "qgjb04", "ffla03", "xqdc02" };
-    string[] enemy5 = { "qgjc01", "xqdc02", "fflc01", "fflb01", "tzba02", "fzsa11" };
-    string[] enemy6 = { "qgjc01", "fzsb03", "fzsc01", "txdc010", "txdc03", "fzba01", "fflb02" };
-    // 攻击多
-    string[] enemy7 = { "qgjc01", "qgjc03", "lgjc03", "tgjb05", "tgjb05", "qgjb01", "qgjb02", "qgjb03", "txdb02", "lxdb02", "lxda02" };
-    // 咒术多
-    string[] enemy8 = { "qgjc01", "fzsa18", "fzsa17", "fzsb10", "fzsb11", "fzsb10", "fflb08", "fflb06", "fflc01", "fflc03", "fflb01" };
-    // 装备多
-    string[] enemy9 = { "qzbc01", "lzbb01", "fzbb02", "lzbb02", "fzsb11", "fzsb10", "qgjb06", "xgjc02", "fgjc02", "lxdc01", "txdc01" };
+    //球
+    string[] enemy1 = { "egjc01", "exdc01", "egjc01" };
+    //龟
+    string[] enemy2 = { "egjc01", "ezsc03", "egjc01", "egjc05" };
+    //巡逻怪
+    string[] enemy3 = { "egjc02", "egjc01", "exdc02" };
+    //狼人
+    string[] enemy4 = { "egjc02", "egjc02", "egjc04", "egjc01", "egjc01", "exdc06" };
+    //美杜莎
+    string[] enemy5 = { "ezsc01", "ezsc02", "eflc01", "eflc02", "ezsc04", "exdc07", "ezsc06" };
+    //牛
+    string[] enemy6 = { "egjc05", "egjc06", "egjc05", "egjc06s" };
+    //猪
+    string[] enemy7 = { "egjc07", "egjc01", "exdc02", "ezbc01", "egjc13", "egjc14", "egjc15" };
+    //巨人
+    string[] enemy8 = { "egjc10", "egjc11", "ezbc02", "exdc05", "egjc02", "exdc08" };
+    // 异兽
+    string[] enemy9 = { "eflc03", "eflc02", "eflc04", "eflc05", "ezsc01", "ezsc02", "ezsc05", "ezbc03", "ezsc07", "ezsc08" };
     // 攻击多 厉害
-    string[] enemy10 = { "qgjb09", "qgjc04", "qzbb04", "txdb02", "fzsb11", "fzsb10", "qgjb06", "qgjc03", "fgjc02", "tgjb06", "qgjb03" };
-    
+    string[] enemy10 = { "eflc03", "eflc02", "eflc04", "eflc05", "ezsc01", "ezsc02", "ezsc05", "ezbc03", "ezsc07", "ezsc08", "egjc10", "egjc11", "ezbc02", "exdc05", "egjc02", "exdc08" };
+
+
     // 敌人初始化数据赋值
     void InitializeEnemy(string str)
     {
         List<ArrayList> list = new List<ArrayList>();
         list = ShareDataBase.sDb.SelectResultSql(string.Format("select * from Enemy where name = '{0}'", str));
         Enemy.Instance.MaxHealth = int.Parse(list[0][1].ToString());
+        Debug.Log(str+"最大生命值："+ Enemy.Instance.MaxHealth);
         Enemy.Instance.Health = Enemy.Instance.MaxHealth;
         Enemy.Instance.ChushiFali = int.Parse(list[0][2].ToString());
         Enemy.Instance.Fali = Enemy.Instance.ChushiFali;
@@ -305,7 +316,9 @@ public class ToggleEventAnimation : MonoBehaviour
 
         Enemy.Instance.HandCard = new List<string>();
         Enemy.Instance.UsedCard = new List<string>();
-
+        Enemy.Instance.exp = int.Parse(list[0][7].ToString());
+        Enemy.Instance.img =list[0][8].ToString();
+        Enemy.Instance.gold = int.Parse(list[0][12].ToString());
         // 装备牌
         Enemy.Instance.Equipments = new List<string>();
         Enemy.Instance.Equipments.Add(list[0][11].ToString());
@@ -353,7 +366,7 @@ public class ToggleEventAnimation : MonoBehaviour
                 print("剩余怪物还未开发");
                 break;
         }
-       
+
 
 
     }
@@ -364,17 +377,11 @@ public class ToggleEventAnimation : MonoBehaviour
     {
         for (int i = 0; i < arr.Length; i++)
         {
-            int ran1 = Random.Range(0, arr.Length);
-            while (Enemy.Instance.OwnedCard.Contains(arr[ran1]))
-            {
-                ran1 = Random.Range(0, arr.Length);
-            }
-            EnemyCardList.Add(ran1);
-            Enemy.Instance.OwnedCard.Add(arr[ran1]);
+            Enemy.Instance.OwnedCard.Add(arr[i]);
         }
-        foreach (var item in EnemyCardList)
+        foreach (var item in arr)
         {
-            print(item);
+            print("敌人卡牌"+item);
         }
         EnemyCardList.Clear();
     }
@@ -383,7 +390,7 @@ public class ToggleEventAnimation : MonoBehaviour
     // 打开下一章节
     public void OpenNextChapter()
     {
-        PlayerPrefs.SetInt("shengXiaPage",21);
+        PlayerPrefs.SetInt("shengXiaPage", 21);
         int curChapter = PlayerPrefs.GetInt("curChapter");
         curChapter++;
         PlayerPrefs.SetInt("curChapter", curChapter);
@@ -416,5 +423,5 @@ public class ToggleEventAnimation : MonoBehaviour
 
         }
     }
- 
+
 }

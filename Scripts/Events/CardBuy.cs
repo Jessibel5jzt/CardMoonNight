@@ -138,15 +138,12 @@ public class CardBuy : MonoBehaviour
     /// </summary>
     private void LoadAllUIObject()
     {
-        string path = Application.dataPath + "/Resources/" + ResourcesDir;
-        DirectoryInfo folder = new DirectoryInfo(path);
-        foreach (FileInfo file in folder.GetFiles("*.prefab"))
+        string[] name = { "Bigemptystar", "Bigfillstar" };
+
+        foreach (string prefabName in name)
         {
-            int index = file.Name.LastIndexOf('.');
-            string UIName = file.Name.Substring(0, index);
-            string UIPath = ResourcesDir + "/" + UIName;
-            GameObject UIObject = Resources.Load<GameObject>(UIPath);
-            UIObjectDic.Add(UIName, UIObject);
+            GameObject UIObject = Resources.Load<GameObject>(ResourcesDir + "/" + prefabName);
+            UIObjectDic.Add(prefabName, UIObject);
         }
     }
 }

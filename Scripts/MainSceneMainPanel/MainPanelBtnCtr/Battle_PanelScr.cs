@@ -6,12 +6,11 @@ public class Battle_PanelScr : UIBase {
 
     public override void DoOnEntering()
     {
-        UIManager.Instance.PopUIPanel();
         this.gameObject.SetActive(true);
     }
     public override void DoOnPausing()
     {
-        this.gameObject.SetActive(true);
+        this.gameObject.SetActive(false);
     }
     public override void DoOnResuming()
     {

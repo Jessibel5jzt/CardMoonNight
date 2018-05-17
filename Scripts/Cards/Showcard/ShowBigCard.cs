@@ -134,6 +134,7 @@ public class ShowBigCard : MonoBehaviour
     /// <returns></returns>
     public UIBase GetUIBase(string UIname)
     {
+        
         //从字典中得到UI
         GameObject UIPrefab = UIObjectDic[UIname];
         GameObject UIObject = GameObject.Instantiate<GameObject>(UIPrefab);
@@ -164,15 +165,15 @@ public class ShowBigCard : MonoBehaviour
     /// </summary>
     private void LoadAllUIObject()
     {
+        string[] name = {"CardCollectorExchange","CardHotel","CardShopBuy","CardSmithyUp"};
+
         string path = Application.dataPath + "/Resources/" + ResourcesDir;
-        DirectoryInfo folder = new DirectoryInfo(path);
-        foreach (FileInfo file in folder.GetFiles("*.prefab"))
+        //DirectoryInfo folder = new DirectoryInfo(path);
+        foreach (string prefabName  in name)
         {
-            int index = file.Name.LastIndexOf('.');
-            string UIName = file.Name.Substring(0, index);
-            string UIPath = ResourcesDir + "/" + UIName;
-            GameObject UIObject = Resources.Load<GameObject>(UIPath);
-            UIObjectDic.Add(UIName, UIObject);
+       //     string UIPath = ResourcesDir + "/" + UIName;
+            GameObject UIObject = Resources.Load<GameObject>(ResourcesDir + "/" + prefabName);
+            UIObjectDic.Add(prefabName, UIObject);
         }
     }
 

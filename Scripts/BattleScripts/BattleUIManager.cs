@@ -81,6 +81,10 @@ public class BattleUIManager : MonoBehaviour
     /// 敌人名字
     /// </summary>
     public string enemyName;
+    [SerializeField]
+    Transform panel_EnemyBuff;
+    [SerializeField]
+    Image emnemyImg;
 
     public static BattleUIManager _instance;
     void Awake()
@@ -94,7 +98,6 @@ public class BattleUIManager : MonoBehaviour
         faliText = sliderFali_Player.transform.Find("faliValue").GetComponent<Text>();
         faliText_Enemy = sliderFali_Enemy.transform.Find("faliValue").GetComponent<Text>();
         healthText_Enemy = sliderHealth_Enemy.transform.Find("healthValue").GetComponent<Text>();
-        
         //取消弃牌==>什么都不做
         quxiao_Btn.onClick.AddListener(
                 delegate ()
@@ -170,6 +173,7 @@ public class BattleUIManager : MonoBehaviour
         UpdateEnemyHealthSlider();
         UpdateEnemyFaliSlider();
         UpdateEnemyXingdong();
+        UpdateEnemyMainImg(Enemy.Instance.img);
     }
     /// <summary>
     /// 更新敌人行动力
@@ -198,9 +202,10 @@ public class BattleUIManager : MonoBehaviour
     /// <summary>
     /// 更新敌人形象图片
     /// </summary>
-    private void UpdateEnemyMainImg()
+    private void UpdateEnemyMainImg(string enemyImg)
     {
         //更新名字,形象,等级
+        emnemyImg.GetComponent<Image>().sprite=Instantiate(Resources.Load<Sprite>(enemyImg));
     }
 
     #endregion
@@ -255,7 +260,7 @@ public class BattleUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 更新装备武器的UI
+    /// 更新装备武器的UI_玩家
     /// </summary>
     public void UpdateEquipmentImg(string id)
     {
@@ -263,6 +268,17 @@ public class BattleUIManager : MonoBehaviour
         equipmentObj.GetComponent<EquipmentUI>().epId = id;
         equipmentObj.transform.SetParent(panel_Buff);
     }
+
+    /// <summary>
+    /// 更新装备武器的UI_敌人
+    /// </summary>
+    public void UpdateEnemyEquipmentImg(string id)
+    {
+        GameObject equipmentObj = Instantiate(equipmentImgPrefab);
+        equipmentObj.GetComponent<EquipmentUI>().epId = id;
+        equipmentObj.transform.SetParent(panel_EnemyBuff);
+    }
+
     #endregion
 
     #region 其他UI
@@ -356,6 +372,66 @@ public class BattleUIManager : MonoBehaviour
     #endregion
 
     #region 动画效果
+    //减血量
+    [SerializeField]
+    Text bloodTextPrefab;
+    //加蓝量
+    [SerializeField]
+    Text faliTextPrefab;
+    [SerializeField]
+    Transform battlePanelTrsf;
+    [SerializeField]
+    Transform imgEnemyTrsf;
+    public void BloodUIChange(RoleBase role, int damage)
+    {
+        if (damage == 0)
+        {
+            return;
+        }
+        if (role.Equals(Enemy.Instance))
+        {
+            Text bloodText = Instantiate(bloodTextPrefab, Vector3.zero, Quaternion.identity, battlePanelTrsf);
+            bloodText.rectTransform.anchoredPosition = new Vector2(50, 84);
+            bloodText.text = "-" + damage.ToString();
+            imgEnemyTrsf.DOShakePosition(2f, new Vector3(10, 10, 0));
+        }
+        if (role.Equals(Player.Instance))
+        {
+            Debug.Log("玩家掉血");
+            Text bloodText = Instantiate(bloodTextPrefab, Vector3.zero, Quaternion.identity, battlePanelTrsf);
+            bloodText.rectTransform.anchoredPosition = new Vector2(250, -620);
+            bloodText.text = "-" + damage.ToString();
+        }
+    }
+
+    public void FaliUIChange(RoleBase role, int addFali)
+    {
+        if (role.Equals(Enemy.Instance))
+        {
+            Text faliText = Instantiate(faliTextPrefab, Vector3.zero, Quaternion.identity, battlePanelTrsf);
+            faliText.rectTransform.anchoredPosition = new Vector2(50, 84);
+            faliText.text = "+" + addFali.ToString();
+        }
+        if (role.Equals(Player.Instance))
+        {
+            Debug.Log("玩家掉血");
+            Text bloodText = Instantiate(faliTextPrefab, Vector3.zero, Quaternion.identity, battlePanelTrsf);
+            bloodText.rectTransform.anchoredPosition = new Vector2(250, -620);
+            bloodText.text = "+" + addFali.ToString();
+        }
+    }
 
     #endregion
+
+
+    /// <summary>
+    /// 游戏结束销毁手牌
+    /// </summary>
+    public void GameOver()
+    {
+        foreach (Transform item in handCard_Panel.transform)
+        {
+            Destroy(item.gameObject);
+        }
+    }
 }

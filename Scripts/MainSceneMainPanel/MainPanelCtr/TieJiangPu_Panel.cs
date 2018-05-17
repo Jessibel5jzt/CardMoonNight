@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TieJiangPu_Panel : UIBase {
 
@@ -18,5 +19,11 @@ public class TieJiangPu_Panel : UIBase {
     public override void DoOnExiting()
     {
         this.gameObject.SetActive(false);
+    }
+    public void Start()
+    {
+        transform.Find("Button").GetComponent<Button>().onClick.AddListener(()=> {
+            UIManager.Instance.PopUIPanel();
+        });
     }
 }

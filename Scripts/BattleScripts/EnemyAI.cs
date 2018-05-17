@@ -9,7 +9,7 @@ public class EnemyAI : MonoBehaviour {
     public static EnemyAI _instance;
 
     [SerializeField]
-    GameObject cardPrefab;
+    GameObject cardPrefab_Enemy;
     [SerializeField]
     Transform handCardTransform;
     [SerializeField]
@@ -34,29 +34,35 @@ public class EnemyAI : MonoBehaviour {
     {
         for (int i = 0; i < cardId.Count; i++)
         {
-            GameObject card = Instantiate(cardPrefab);
-            //移除组件
-            Destroy(card.GetComponent<CardUI>());
+            GameObject card = Instantiate(cardPrefab_Enemy);
+            //给cardUI的cardId赋值
+            card.GetComponent<CardUI_enemy>().cardId = cardId[i];
             //设置卡牌位置为initialCardPos
             card.transform.SetParent(handCardTransform);
-            card.transform.localScale = Vector3.one;
+            card.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
         }
     }
     
     public IEnumerator DaPai()
     {
+        int index = 0;
         while (true)
         {
-            int index = 0;
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1f);
             //出牌动画
+            //如果魔法消耗大于法力值
+            if (handCardTransform.GetChild(index).GetComponent<CardUI_enemy>().XiaoHao > Enemy.Instance.Fali)
+            {
+                index++;
+                continue;
+            }
             handCardTransform.GetComponent<GridLayoutGroup>().enabled = false;
             handCardTransform.GetChild(index).DOMove(usedCardTransform.position, 0.5f);
-            handCardTransform.GetChild(index).DOScale(6, 0.5f);
-            yield return new WaitForSeconds(0.6f);
+            handCardTransform.GetChild(index).DOScale(1.5f, 0.5f);
+            yield return new WaitForSeconds(1f);
             handCardTransform.GetComponent<GridLayoutGroup>().enabled = true;
             //如果出牌有效,则调用方法
-			if (Enemy.Instance.ChuPaiYouXiao) {
+            if (Enemy.Instance.ChuPaiYouXiao) {
 				RoleOperation.Instance.ChuPai(Enemy.Instance.HandCard[index]);	
 			}
             //更新UI

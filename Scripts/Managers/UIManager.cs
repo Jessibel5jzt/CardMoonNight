@@ -19,22 +19,27 @@ public class UIManager : MonoBehaviour {
 
 	public Transform UIParent;
 
-	public string ResourcesDir="UIPrefabs";
 
-	//存放所有UI的栈
-	private Stack<UIBase> UIStack =new Stack<UIBase>();
+    //存放所有UI的栈
+    private Stack<UIBase> UIStack;
 	//名字,预设体
-	private Dictionary<string,GameObject> UIObjectDic=new Dictionary<string, GameObject>();
+	private Dictionary<string,GameObject> UIObjectDic;
 	//缓存字典
-	private Dictionary<string,UIBase> currentUIDic=new Dictionary<string, UIBase>();
+	private Dictionary<string,UIBase> currentUIDic;
 
 	void Awake(){
-		_instance = this;
+        Handheld.PlayFullScreenMovie("MyMovie.mp4", Color.black, FullScreenMovieControlMode.CancelOnInput);
+        //print("streamingAssetsPath======>" +Application.streamingAssetsPath);
+        UIStack = new Stack<UIBase>();
+        UIObjectDic = new Dictionary<string, GameObject>();
+        currentUIDic = new Dictionary<string, UIBase>();
+        _instance = this;
         DontDestroyOnLoad(this);
         UIParent = this.transform;
         this.name = "UIManager";
 		LoadAllUIObject ();
 	}
+
 	/// <summary>
 	/// 入栈
 	/// </summary>
@@ -99,40 +104,65 @@ public class UIManager : MonoBehaviour {
 		}
 		//从字典中得到UI
 		GameObject UIPrefab = UIObjectDic [UIname];
+        Debug.Log(UIPrefab.name+"《-----");
 		GameObject UIObject = GameObject.Instantiate<GameObject> (UIPrefab);
 		UIObject.transform.SetParent (UIParent,false);
 		UIBase uibase=UIObject.GetComponent<UIBase>();
 		return uibase;
 	}
 
-	/// <summary>
-	/// 出栈,界面隐藏
-	/// </summary>
-	public void PopUIPanel(){
-		if (UIStack.Count == 0)
-			return;
-		
-		UIBase old_topUI = UIStack.Pop ();
-		old_topUI.DoOnExiting ();
-		old_topUI.UILayer = -1;
-		if (UIStack.Count > 0) {
-			UIBase new_topUI = UIStack.Peek ();
-			new_topUI.DoOnResuming ();
-		}
-	}
+    /// <summary>
+    /// 出栈,界面隐藏
+    /// </summary>
+    public void PopUIPanel()
+    {
+        if (UIStack.Count == 0)
+            return;
 
-	/// <summary>
-	/// 动态加载所有UI预设体
-	/// </summary>
-	private void LoadAllUIObject(){
-		string path = Application.dataPath + "/Resources/" + ResourcesDir;
-		DirectoryInfo folder=new DirectoryInfo(path);
-		foreach (FileInfo file in folder.GetFiles("*.prefab")) {
-			int index = file.Name.LastIndexOf ('.');
-			string UIName = file.Name.Substring (0,index);
-			string UIPath=ResourcesDir + "/" + UIName;
-			GameObject UIObject = Resources.Load<GameObject> (UIPath);
-			UIObjectDic.Add (UIName,UIObject);
-		}
-	}
+        UIBase old_topUI = UIStack.Pop();
+        old_topUI.DoOnExiting();
+        old_topUI.UILayer = -1;
+        if (UIStack.Count > 0)
+        {
+            UIBase new_topUI = UIStack.Peek();
+            new_topUI.DoOnResuming();
+        }
+
+
+
+    }
+
+    string m_ResSubFileName = "UIPrefabs";
+    /// <summary>
+    /// 动态加载所有UI预设体
+    /// </summary>
+    private void LoadAllUIObject()
+    {
+       // string path = StreamingAssetsPathTool.Instance.GetNormalFileFromAnyPlatform( m_ResSubFileName+"/");
+        string[] name = {"Achievements_Panel","Battle_Panel","BeginUI_Panel","Card","CardPrefab","CardPrefab_Enemy","CardPrefab_Qipai",
+          "HaiXiuDeBaoXiang_Panel","Image_buff","Image_equipment","KaiPaiShouCangJia_Panel","LaoMaoShangDianPanel","MainSceneMainPanel","NewGame_Panel",
+          "Notice_Panel","Setting_Panel","SliderFaliPrefab","SliderHealthPrefab","SliderPrefab","TieJiangPu_Panel","WangYouJiuDian_Panel","XianNVZhuFu_Panel","XiaYiGeLuKou_Panel","YaoJiDaShi_Panel"
+        };
+        
+        foreach (string prefabName in name)
+        {
+            GameObject UIObject = Resources.Load<GameObject>(m_ResSubFileName +"/"+ prefabName);
+            UIObjectDic.Add(prefabName, UIObject);
+        }
+
+        foreach (var item in UIObjectDic)
+        {
+            Debug.Log(item);
+        }
+      
+    }
+	 
+
+
+
+
+
+
+
 }
+

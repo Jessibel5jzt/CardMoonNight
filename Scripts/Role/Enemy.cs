@@ -14,6 +14,7 @@ public class Enemy : RoleBase
     }
     #endregion
 
-
-
+    public int exp { get; set; }
+    public string img { get; set; }
+    public int gold { get; set; }
 }

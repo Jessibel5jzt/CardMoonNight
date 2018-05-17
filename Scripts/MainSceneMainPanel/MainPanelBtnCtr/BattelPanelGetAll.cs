@@ -10,7 +10,8 @@ public class BattelPanelGetAll : EveryPanelBtnOnclickCtr {
         switch (arg.id)
         {
             case 1:
-
+                Debug.Log("aaaaaaaaaaa");
+            //    Blood.B_Blood_Text(Player.Instance,5);
                 break;
             case 2:
 
@@ -23,7 +24,7 @@ public class BattelPanelGetAll : EveryPanelBtnOnclickCtr {
                 RoleOperation.Instance.XuanZeQiPai();
                 break;
             case 5:
-
+                UIManager.Instance.PopUIPanel();
                 break;
             default:
                 break;

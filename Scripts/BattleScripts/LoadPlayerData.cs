@@ -45,7 +45,7 @@ public class LoadPlayerData : MonoBehaviour {
         //Player.Instance.Equipments = new List<string>();
         //Player.Instance.UsedCard = new List<string>();
         //Player.Instance.HuiheChoupai = 3;
-       
+
         //Player.Instance.MaxCard = 3;
         //Player.Instance.CurrentBuffs = new List<string>();
         //Player.Instance.Damage = 0;
@@ -53,33 +53,36 @@ public class LoadPlayerData : MonoBehaviour {
         #endregion
 
 
-        #region 初始化敌人数据
-        Enemy.Instance.MaxHealth = 40;
-        Enemy.Instance.Health = 40;
-        Enemy.Instance.Fali = 10;
-        Enemy.Instance.XingdongLi = 2;
-        Enemy.Instance.HandCard = new List<string>();
-        Enemy.Instance.ChushiFali = 2;
-        Enemy.Instance.OwnedCard = new List<string>();
-        Enemy.Instance.OwnedCard.Add("egjc01");
-        Enemy.Instance.OwnedCard.Add("egjc02");
-        Enemy.Instance.OwnedCard.Add("egjc02");
-        Enemy.Instance.OwnedCard.Add("egjc01");
-        Enemy.Instance.OwnedCard.Add("egjc03");
-        Enemy.Instance.OwnedCard.Add("egjc04");
-        Enemy.Instance.OwnedCard.Add("egjc01");
-        Enemy.Instance.OwnedCard.Add("egjc05");
-        Enemy.Instance.Equipments = new List<string>();
-        Enemy.Instance.HuiheChoupai = 3;
-        Enemy.Instance.ChushiXingdong = 2;
-        Enemy.Instance.CurrentBuffs = new List<string>();
-        Enemy.Instance.MorenShanBi = 0;
-        Enemy.Instance.UsedCard = new List<string>();
-        #endregion
+        //#region 初始化敌人数据
+        ////Enemy.Instance.MaxHealth = 40;
+        ////Enemy.Instance.Health = 40;
+        ////Enemy.Instance.Fali = 10;
+        ////Enemy.Instance.XingdongLi = 2;
+        ////Enemy.Instance.HandCard = new List<string>();
+        ////Enemy.Instance.ChushiFali = 2;
+        ////Enemy.Instance.OwnedCard = new List<string>();
+        ////Enemy.Instance.OwnedCard.Add("egjc01");
+        ////Enemy.Instance.OwnedCard.Add("egjc02");
+        ////Enemy.Instance.OwnedCard.Add("egjc02");
+        ////Enemy.Instance.OwnedCard.Add("egjc01");
+        ////Enemy.Instance.OwnedCard.Add("egjc03");
+        ////Enemy.Instance.OwnedCard.Add("egjc04");
+        ////Enemy.Instance.OwnedCard.Add("egjc01");
+        ////Enemy.Instance.OwnedCard.Add("egjc05");
+        ////Enemy.Instance.Equipments = new List<string>();
+        ////Enemy.Instance.HuiheChoupai = 3;
+        ////Enemy.Instance.ChushiXingdong = 2;
+        ////Enemy.Instance.CurrentBuffs = new List<string>();
+        ////Enemy.Instance.MorenShanBi = 0;
+        ////Enemy.Instance.UsedCard = new List<string>();
+        //#endregion
+        //Debug.Log("开始战斗时敌人的生命之："+Enemy.Instance.MaxHealth);
+        //Debug.Log("开始战斗时敌人的生命之：" + Enemy.Instance.Health);
+    }
 
-        foreach (string id in Player.Instance.OwnedCard)
-        {
-            Debug.Log(id);
-        }
-    }	
+    private void Start()
+    {
+        
+    }
+
 }

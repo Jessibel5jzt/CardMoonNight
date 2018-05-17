@@ -7,7 +7,6 @@ public class BeginUISceneInit : MonoBehaviour {
     {
         // 游戏初始化
         UIManager.Instance.PushUIPanel("BeginUI_Panel");
-        
        
     }
     

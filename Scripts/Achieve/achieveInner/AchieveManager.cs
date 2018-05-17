@@ -21,13 +21,13 @@ public class AchieveManager : MonoBehaviour
 
     private GameObject ShopMask;
 
-    [SerializeField]
-    private const string shopJsonPath = "/Config/config.xml";
+    private string shopJsonPath = "/Config/config.xml";
 
     List<string> menuName = new List<string>();
 
     void Start()
     {
+        shopJsonPath = StreamingAssetsPathTool.Instance.GetNormalFileFromAnyPlatform("config.xml");
         ShopInit();
     }
 
@@ -89,7 +89,7 @@ public class AchieveManager : MonoBehaviour
     {
         //找到xml     
         XmlDocument doc = new XmlDocument();
-        doc.Load(Application.dataPath + shopJsonPath);
+        doc.Load(shopJsonPath);
         XmlElement root = doc.DocumentElement;
         XmlElement shop = root.SelectSingleNode("achieves") as XmlElement;
         toggleMenuNumber = shop.ChildNodes.Count;

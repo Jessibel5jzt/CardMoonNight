@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class MainSceneMainPanelBtnScr : EveryPanelBtnOnclickCtr {
 
+    public void OnEnable()
+    {
+        RefreshUI rui = new RefreshUI();
+        rui.RefreshMainGold(CreateANewVenture.Instance.newRecordData);
+    }
     /// <summary>
     /// 每个按钮的点击事件，该id为从上左至下右
     /// </summary>

@@ -42,7 +42,7 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
     /// </summary>
     public string cardId;
 	/// <summary>
-	/// 卡牌的消耗
+	/// 卡牌的消耗(法力)
 	/// </summary>
 	private int xiaohao;
 	public int XiaoHao{
@@ -64,12 +64,12 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
     /// <summary>
     /// 父物体已经设为Panel_PlayerCard
     /// </summary>
-    private bool isInPlayerCardTransform = false;
+    public bool isInPlayerCardTransform;
     private Vector2 originalSize;//卡牌原始大小
     private Vector2 originalPos;//卡牌原始位置
     private float yDelta;//拖动卡牌时,卡牌在Y轴方向的位移变化
     private RectTransform playerCardRectTransform;//函数的参数,手牌Panel的RectTransform
-
+    
     void Start()
     {
         //获得Panel的Transform
@@ -82,29 +82,24 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
         handCardPos = GameObject.Find("HandCardPos").transform;
         //生成卡牌的UI
         GenerateCardUI();
+        //
+        transform.DOMove(handCardPos.position,0.3f);
+        //
+
     }
 
     void Update()
     {
-        //卡牌移动到卡牌区域
-        //如果没有到就移动,到了的话就不再移动
-        if (isInPlayerCardTransform == false)
-        { transform.localPosition = Vector2.Lerp(transform.localPosition, new Vector2(0, -437.5f), 0.3f); }
-        //当卡牌移动到该位置时,将卡牌设置为Panel_PlayerCard的子物体
-        //如果还没有设置父物体,则设置,设置了就不在执行这部分
-        if (isInPlayerCardTransform == false)
-        {
-            if (Mathf.Abs(transform.localPosition.y - (-437.5f)) < 0.01f)
+        //如果到达该位置,并且还不是子物体时
+        if (Mathf.Abs(transform.position.y- handCardPos.position.y)< 0.02f && this.GetComponent<CardUI>().isInPlayerCardTransform == false)
             {
-                //设置父物体
-                transform.SetParent(playerCardTransform);
-                //记录卡牌的初始位置,和初始大小
-                originalSize = rectTransform.sizeDelta;
-                //修改标记
-                isInPlayerCardTransform = true;
-                //卡牌进行排列
+                    //设置父物体
+                    transform.SetParent(playerCardTransform);
+                    //记录卡牌的初始位置,和初始大小
+                    originalSize = rectTransform.sizeDelta;
+            //修改标记
+            this.GetComponent<CardUI>().isInPlayerCardTransform = true;
             }
-        }
     }
 
     /// <summary>
@@ -186,8 +181,8 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
     public void OnPointerDown(PointerEventData eventData)
     {
         //Debug.Log("卡牌的初始位置是" + rectTransform.anchoredPosition);
-        originalPos = rectTransform.anchoredPosition/*+ new Vector2(playerCardRectTransform.rect.width / 2, -playerCardRectTransform.rect.height / 2)*/;
-        rectTransform.sizeDelta *= 1.5f;
+        originalPos = rectTransform.anchoredPosition;
+        transform.DOScale(1.5f,0.3f);
     }
 
     /// <summary>
@@ -196,8 +191,7 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
     /// <param name="eventData"></param>
     public void OnPointerUp(PointerEventData eventData)
     {
-        rectTransform.sizeDelta = originalSize;
-        StartCoroutine(ReturnToOriginalPos());
+        transform.DOScale(1, 0.1f);
     }
 
     /// <summary>
@@ -221,7 +215,6 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
             {
                 yDelta = Mathf.Abs(rectTransform.anchoredPosition.y - originalPos.y);
             }
-        
     }
 
     /// <summary>
@@ -231,8 +224,8 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
     public void OnEndDrag(PointerEventData eventData)
     {
         transform.parent.GetComponent<HorizontalLayoutGroup>().enabled = true;
-        //如果该回合不是玩家回合,则不能触发牌的方法
-        if (BattleRoundCtrl._instance.whosRound==RoleRound.PlayerRound)
+        //如果该回合不是玩家回合,则不能触发牌的方法(或在使用咒术卡时,法力不够,也不能使用)
+        if (BattleRoundCtrl._instance.whosRound==RoleRound.PlayerRound||xiaohao>Player.Instance.Fali)
         {
             //如果向上拖拽卡牌的位移,大于50,则视为出牌,否则,让卡牌返回原位置
             if (yDelta > 100)
@@ -249,7 +242,7 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
             }
             else
             {
-                StartCoroutine(ReturnToOriginalPos());
+                transform.DOMove(originalPos, 0.3f);
             }
         }
     }
@@ -274,7 +267,6 @@ public class CardUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDrag
     /// <param name="eventData"></param>
     public void OnBeginDrag(PointerEventData eventData)
     {
-        rectTransform.sizeDelta = originalSize;
     }
     
 

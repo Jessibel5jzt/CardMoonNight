@@ -35,6 +35,7 @@ public class Player : RoleBase
     /// 玩家手牌上限
     /// </summary>
     public int MaxCard { get; set; }
+    public int Exp { get; set; }
 
     /// <summary>
     /// 玩家技能1

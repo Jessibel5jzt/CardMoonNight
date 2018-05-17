@@ -20,13 +20,13 @@ public class CardManager : MonoBehaviour
 
     private GameObject ShopMask;
 
-    [SerializeField]
-    private const string shopJsonPath = "/Config/config.xml";
+    private string shopJsonPath = "Config/config.xml";
 
     List<string> menuName = new List<string>();
 
     void Start()
     {
+        shopJsonPath = StreamingAssetsPathTool.Instance.GetNormalFileFromAnyPlatform("config.xml");
         ShopInit();
     }
 
@@ -80,7 +80,7 @@ public class CardManager : MonoBehaviour
     {
         //找到xml     
         XmlDocument doc = new XmlDocument();
-        doc.Load(Application.dataPath + shopJsonPath);
+        doc.Load(shopJsonPath);
         XmlElement root = doc.DocumentElement;
         XmlElement shop = root.SelectSingleNode("cards") as XmlElement;
         toggleMenuNumber = shop.ChildNodes.Count;

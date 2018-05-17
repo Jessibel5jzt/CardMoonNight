@@ -58,8 +58,8 @@ public class RoleOperation : Singleton<RoleOperation> {
         BattleRoundCtrl._instance.roundCount += 1;
         //更新UI
         BattleUIManager._instance.UpdatePlayerState();
-        Debug.Log("上回合坟场的牌:"+ Player.Instance.UsedCard.Count);
-        Debug.Log("卡包牌:" + Player.Instance.OwnedCard.Count);
+        //Debug.Log("上回合坟场的牌:"+ Player.Instance.UsedCard.Count);
+        //Debug.Log("卡包牌:" + Player.Instance.OwnedCard.Count);
         //坟场的牌进入ownedCard
         for (int i = 0; i < Player.Instance.UsedCard.Count; i++)
 		{
@@ -71,8 +71,8 @@ public class RoleOperation : Singleton<RoleOperation> {
 			}
 			Player.Instance.OwnedCard.Add(Player.Instance.UsedCard[i]);
 		}
-        Debug.Log("进卡包后坟场牌:" + Player.Instance.UsedCard.Count);
-        Debug.Log("进卡包后卡包牌:" + Player.Instance.OwnedCard.Count);
+        //Debug.Log("进卡包后坟场牌:" + Player.Instance.UsedCard.Count);
+        //Debug.Log("进卡包后卡包牌:" + Player.Instance.OwnedCard.Count);
         //清空坟场的牌
         Player.Instance.UsedCard.Clear();
     }
@@ -117,8 +117,8 @@ public class RoleOperation : Singleton<RoleOperation> {
         {
             Player.Instance.Fali = Player.Instance.ChushiFali;
         }
-       //减伤归零
-		Player.Instance.JianShang=0;
+        //减伤归零
+        Enemy.Instance.JianShang=0;
     }
     /// <summary>
     /// 回合结束常规结算_敌人
@@ -134,7 +134,7 @@ public class RoleOperation : Singleton<RoleOperation> {
             Enemy.Instance.Fali = Enemy.Instance.ChushiFali;
         }
 		//减伤归零
-		Enemy.Instance.JianShang=0; 
+		Player.Instance.JianShang=0; 
         //重置免伤
         CardFuncsCtrl.instance.forbidDamage = false;
     }
@@ -189,12 +189,7 @@ public class RoleOperation : Singleton<RoleOperation> {
     public int lxda03_times = 0;
     //短剑标记
     public int duanjiaAttackTimes = 0;
-
-
-
-
-
-
+    
     /// <summary>
     /// 玩家回合开始
     /// </summary>
@@ -339,7 +334,7 @@ public class RoleOperation : Singleton<RoleOperation> {
         cpFuncs_player(cardId);
         Player.Instance.Damage = 0;
         Player.Instance.FaliIncrease = 0;
-        Player.Instance.SuccessfulShanBi = false;
+        Enemy.Instance.SuccessfulShanBi = false;
         Player.Instance.ChuPaiYouXiao = true;
     }
     /// <summary>
@@ -350,7 +345,7 @@ public class RoleOperation : Singleton<RoleOperation> {
         cpFuncs_enemy(cardId);
         Enemy.Instance.Damage = 0;
         Enemy.Instance.FaliIncrease = 0;
-        Enemy.Instance.SuccessfulShanBi = false;
+        Player.Instance.SuccessfulShanBi = false;
         Enemy.Instance.ChuPaiYouXiao = true;
     }
 
@@ -400,6 +395,29 @@ public class RoleOperation : Singleton<RoleOperation> {
         jsFuncs_Enemy();
     }
 
+    /// <summary>
+    /// 战斗胜利后刷新玩家的信息
+    /// </summary>
+    RefreshUI rui = new RefreshUI();
+    
+    public void ResetPlayerInfoSuccessful()
+    {
+        
+        CreateANewVenture.Instance.newRecordData.Exp += Enemy.Instance.exp;
+        CreateANewVenture.Instance.newRecordData.Health = Player.Instance.Health;
+        CreateANewVenture.Instance.newRecordData.Gold += Enemy.Instance.gold;
+        BattleUIManager._instance.GameOver();
+        rui.RefreshMainGold(CreateANewVenture.Instance.newRecordData);
+        Debug.Log(CreateANewVenture.Instance.newRecordData.Gold);
+        //Transform go = GameObject.Find("UIManager").transform.Find("MainSceneMainPanel(Clone)");
+       
+    }
 
-
+    /// <summary>
+    /// 失败后刷新
+    /// </summary>
+    public void ResetPlayerInfoFailed()
+    {
+        BattleUIManager._instance.GameOver();
+    }
 }

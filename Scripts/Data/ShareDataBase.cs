@@ -26,10 +26,11 @@ public class ShareDataBase
 	private ShareDataBase ()
 	{
         //打包发布的各个平台路径【跟不同平台读取数据的路径区分开】
-#if UNITY_EDITOR
-		// StreamingAssets路径
-		string dataPath = "Data Source = " + Application.streamingAssetsPath + "/SQLite/MoonNight.db";
-#endif
+
+        // StreamingAssets路径
+        //string dataPath = "Data Source = " + Application.streamingAssetsPath + "/SQLite/MoonNight.db";
+        string dataPath = StreamingAssetsPathTool.Instance.DBPathFromAnyPlatform("MoonNight.sqlite");
+        Debug.Log("---***->"+dataPath);
         try
         {
 			if (con == null) {
@@ -51,7 +52,7 @@ public class ShareDataBase
 			//每一次打开数据库时再创建这个SQLite指令，关闭时释放掉
 			command = con.CreateCommand ();
 		} catch (SqliteException ex) {
-    
+            Debug.Log(ex);
 		}
 	}
 	// 关闭数据库

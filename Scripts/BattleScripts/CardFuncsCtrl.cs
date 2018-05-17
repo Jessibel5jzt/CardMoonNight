@@ -30,7 +30,6 @@ public class CardFuncsCtrl : MonoBehaviour
     //穿刺伤害
     public bool chuanciDamage = false;
 
-
     void Awake()
     {
         instance = this;
@@ -1296,37 +1295,252 @@ public class CardFuncsCtrl : MonoBehaviour
     #endregion
 
     #region 敌人卡牌方法
-    //玩家掉10血
     public void egjc01()
     {
         DecBlood(Player.Instance, 1);
-
     }
-    //减玩家2行动,5法力
     public void egjc02()
     {
-        DecFali(Player.Instance, 5);
-        DecXingdong(Player.Instance, 2);
-
+        DecBlood(Player.Instance, 3);
     }
-    //赠3法力
     public void egjc03()
     {
-        AddFali(Enemy.Instance, 3);
-
+        DecBlood(Player.Instance, 5);
     }
-    //加1行动
+    public void ezsc01()
+    {
+        FaShuDecBlood(Player.Instance,2,2,0);
+    }
+    public void ezsc02()
+    {
+        FaShuDecBlood(Player.Instance, 2, 2, 2);
+    }
+    public void eflc01()
+    {
+        AddFali(Enemy.Instance,2);
+    }
+    public void eflc02()
+    {
+        AddFali(Enemy.Instance, 4);
+    }
+    public void eflc03()
+    {
+        AddFali(Enemy.Instance, 6);
+    }
+
+    //愤怒的小球,egjc01,exdc01,egjc01
+    public void exdc01() {
+        RoleOperation.Instance.jsFuncs_Enemy += exdc01_buff;
+        RoleOperation.Instance.ksFuncs_Player += exdc01_buffRemove;
+    }
+    private void exdc01_buffRemove()
+    {
+        Player.Instance.HuiheChoupai++;
+        RoleOperation.Instance.ksFuncs_Player -= exdc01_buffRemove;
+    }
+    private void exdc01_buff()
+    {
+        Player.Instance.HuiheChoupai--;
+        RoleOperation.Instance.jsFuncs_Enemy -= exdc01_buff;
+    }
+
+    //耐心的乌龟,egjc01 ezsc03  egjc01 
+    public void ezsc03() {
+        AddBlood(Enemy.Instance,5);
+    }
+
+    //巡逻的小怪 egjc02 egjc01 exdc02 egjc05
+    public void exdc02()
+    {
+        int shanghai = 1 + Player.Instance.HandCard.Count;
+        DecBlood(Player.Instance,shanghai);
+    }
+
+    //狼人 egjc02 egjc02  egjc04  egjc01 egjc01 exdc06
     public void egjc04()
     {
-        AddXingdong(Enemy.Instance, 1);
-
+        DecBlood(Enemy.Instance, 4);
+        DecBlood(Player.Instance, 10);
     }
 
+    public void exdc06()
+    {
+        RoleOperation.Instance.ChouPai(Player.Instance.XingdongLi,Enemy.Instance);
+        Player.Instance.XingdongLi = 0;
+    }
+
+    //美杜莎 ezsc01 ezsc02 eflc01 eflc02 ezsc04  exdc07
+    public void ezsc04() {
+        Player.Instance.ZhongDu += 3;      
+    }
+
+    public void exdc07()
+    {
+        Player.Instance.ChuPaiYouXiao = false;
+        RoleOperation.Instance.cpFuncs_player += exdc07_buff;
+    }
+    public void exdc07_buff(string id)
+    {
+        Player.Instance.ChuPaiYouXiao = true;
+        RoleOperation.Instance.cpFuncs_player -= exdc07_buff;
+    }
+
+    public void ezsc06() {
+        FaShuDecBlood(Player.Instance,0,2,0);
+        Player.Instance.HuoDamageIncrease += 2;
+        RoleOperation.Instance.jsFuncs_Enemy += ezsc06_Remove;
+    }
+    public void ezsc06_Remove()
+    {
+        Player.Instance.HuoDamageIncrease -= 2;
+        RoleOperation.Instance.jsFuncs_Enemy -= ezsc06_Remove;
+    }
+
+
+    //愤怒的老牛
     public void egjc05()
     {
-        ////抽两张牌
-        //List<string> newCardId= RoleOperation.Instance.ChouPai(2, Enemy.Instance);
-        //EnemyAI._instance.InstantiateHandCards(newCardId);
+        int[] damage = { 2, 4 ,6 };
+        int index= UnityEngine.Random.Range(0, 3);
+        DecBlood(Player.Instance,damage[index]);
+    }
+
+    public void egjc06()
+    {
+        int[] damage = {4,6,8};
+        int index = UnityEngine.Random.Range(0, 3);
+        DecBlood(Player.Instance, damage[index]);
+    }
+    //猪
+    public void egjc07()
+    {
+        DecBlood(Player.Instance, 2);
+        AddBlood(Enemy.Instance,2); 
+    }
+
+    public void egjc13() {
+        DecBlood(Player.Instance,1);
+        RoleOperation.Instance.ChouPai(1,Enemy.Instance);
+    }
+
+    public void egjc14() {
+        DecBlood(Player.Instance,1);
+        Enemy.Instance.JianShang += 2;
+    }
+
+    public void egjc15()
+    {
+        Player.Instance.HuiheChoupai -= 1;
+        Player.Instance.XingdongLi -= 1;
+        RoleOperation.Instance.jsFuncs_Player += egjc15_Remove;
+    }
+    public void egjc15_Remove()
+    {
+        Player.Instance.HuiheChoupai += 1;
+    }
+
+    public void ezbc01()
+    {
+        RoleOperation.Instance.ksFuncs_Enemy += ezbc01_buff;
+    }
+    public void ezbc01_buff()
+    {
+        Enemy.Instance.Didang += 3;
+    }
+    //巨人egjc10 egjc11 ezbc02 exdc05 egjc02 exdc08
+    public void egjc10()
+    {
+        int shanghai = 2 + (Enemy.Instance.MaxHealth - Enemy.Instance.Health) / 5;
+        DecBlood(Player.Instance, shanghai);
+    }
+    public void egjc11()
+    {
+        int shanghai = 4 + (Enemy.Instance.MaxHealth - Enemy.Instance.Health) / 5;
+        DecBlood(Player.Instance, shanghai);
+    }
+    public void egjc12()
+    {
+        int shanghai = 6 + (Enemy.Instance.MaxHealth - Enemy.Instance.Health) / 5;
+        DecBlood(Player.Instance, shanghai);
+    }
+
+    public void ezbc02()
+    {
+        BattleUIManager._instance.UpdateEnemyEquipmentImg("ezbc02");
+        Enemy.Instance.ShanBi += 1;
+        RoleOperation.Instance.cpFuncs_player += ezbc02_buff;
+    }
+    public void ezbc02_buff(string id)
+    {
+        //闪避成功
+        if (Enemy.Instance.SuccessfulShanBi)
+        {
+            RoleOperation.Instance.ChouPai(1, Enemy.Instance);
+        }
+    }
+
+    public void exdc05()
+    {
+        DecBlood(Player.Instance, 1);
+        RoleOperation.Instance.ChouPai(1,Enemy.Instance);
+    }
+
+    public void exdc08()
+    {
+        AddBlood(Enemy.Instance,2);
+        RoleOperation.Instance.ChouPai(2, Enemy.Instance);
+    }
+
+    //异兽    eflc03 eflc02 eflc04 eflc05 ezsc01 ezsc02 ezsc05  ebzsc7 ezsc08
+    public void eflc04()
+    {
+        AddFali(Enemy.Instance, 3);
+        AddBlood(Enemy.Instance, 3);
+    }
+    public void eflc05()
+    {
+        AddFali(Enemy.Instance, 3);
+        FaShuDecBlood(Enemy.Instance, 3, 0, 0);
+        Player.Instance.HanLeng++;
+    }
+    public void ezsc05()
+    {
+        FaShuDecBlood(Enemy.Instance, 4,0,0);
+        Player.Instance.HanLeng++;
+    }
+
+    public void ezbc03() {
+        BattleUIManager._instance.UpdateEnemyEquipmentImg("ezbc03");
+        RoleOperation.Instance.ksFuncs_Enemy += ezbc03_buff;
+    }
+    public void ezbc03_buff()
+    {
+        Enemy.Instance.Fali += 2;
+    }
+
+    public void ezsc07() {
+        Player.Instance.ZhongDu += 2;
+    }
+
+    public void ezsc08()
+    {
+        FaShuDecBlood(Player.Instance,0,0,4);
+        foreach (string cardId in Enemy.Instance.OwnedCard)
+        {
+            if (cardId[1] == 'z' && cardId[2] == 's')
+            {
+                //加入手牌
+                Enemy.Instance.HandCard.Add(cardId);
+                //从卡包移除
+                int index = Enemy.Instance.OwnedCard.IndexOf(cardId);
+                Enemy.Instance.OwnedCard.RemoveAt(index);
+                //
+                List<string> id = new List<string>();
+                id.Add(cardId);
+                EnemyAI._instance.InstantiateHandCards(id);
+                break;
+            }
+        }
     }
 
 
@@ -1430,6 +1644,7 @@ public class CardFuncsCtrl : MonoBehaviour
         role.Damage = damage;
         //减血
         role.Health -= damage;
+        BattleUIManager._instance.BloodUIChange(role,damage);
         //重置穿刺伤害
         chuanciDamage = false;
     }
@@ -1465,6 +1680,7 @@ public class CardFuncsCtrl : MonoBehaviour
     {
         role.Fali += num;
         role.FaliIncrease = num;
+        BattleUIManager._instance.FaliUIChange(role, num);
     }
     /// <summary>
     /// 减蓝量
@@ -1611,7 +1827,7 @@ public class CardFuncsCtrl : MonoBehaviour
         #endregion
         #endregion
 
-
+        
         #region 通用
         #region 装备
         cardFuncDictionary.Add("tzbc01", tzbc01);//隐藏服
@@ -1663,8 +1879,48 @@ public class CardFuncsCtrl : MonoBehaviour
         cardFuncDictionary.Add("egjc01", egjc01);
         cardFuncDictionary.Add("egjc02", egjc02);
         cardFuncDictionary.Add("egjc03", egjc03);
+        cardFuncDictionary.Add("ezsc01", ezsc01);
+        cardFuncDictionary.Add("ezsc02", ezsc02);
+        cardFuncDictionary.Add("eflc01", eflc01);
+        cardFuncDictionary.Add("eflc02", eflc02);
+        cardFuncDictionary.Add("eflc03", eflc03);
+        //愤怒的小球
+        cardFuncDictionary.Add("exdc01", exdc01);
+        //乌龟
+        cardFuncDictionary.Add("ezsc03", ezsc03);
+        //巡逻的小怪
+        cardFuncDictionary.Add("exdc02", exdc02);
+        //狼人
         cardFuncDictionary.Add("egjc04", egjc04);
+        cardFuncDictionary.Add("exdc06", exdc06);
+        //美杜莎
+        cardFuncDictionary.Add("ezsc04", ezsc04); 
+        cardFuncDictionary.Add("exdc07", exdc07); 
+        cardFuncDictionary.Add("ezsc06", ezsc06);
+        //牛
         cardFuncDictionary.Add("egjc05", egjc05);
+        cardFuncDictionary.Add("egjc06", egjc06);
+        //猪
+        cardFuncDictionary.Add("egjc07", egjc07);
+        cardFuncDictionary.Add("ezbc01", ezbc01); 
+        cardFuncDictionary.Add("egjc13", egjc13); 
+        cardFuncDictionary.Add("egjc14", egjc14); 
+        cardFuncDictionary.Add("egjc15", egjc15);
+        //巨人
+        cardFuncDictionary.Add("egjc10", egjc10);
+        cardFuncDictionary.Add("egjc11", egjc11);
+        cardFuncDictionary.Add("egjc12", egjc12);
+        cardFuncDictionary.Add("ezbc02", ezbc02);
+        cardFuncDictionary.Add("exdc05", exdc05); 
+        cardFuncDictionary.Add("exdc08", exdc08);
+        //异兽
+        cardFuncDictionary.Add("eflc04", eflc04);
+        cardFuncDictionary.Add("eflc05", eflc05);
+        cardFuncDictionary.Add("ezsc05", ezsc05); 
+        cardFuncDictionary.Add("ezbc03", ezbc03);
+        cardFuncDictionary.Add("ezsc07", ezsc07);
+        cardFuncDictionary.Add("ezsc07", ezsc07); 
+        cardFuncDictionary.Add("ezsc08", ezsc08);
         #endregion
 
     }
